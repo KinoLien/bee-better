@@ -18,4 +18,19 @@ if ( isProduction ) {
 
 var db = admin.firestore();
 
-// exports.addCommit = function(data){ ... }
+var cellsCollect = db.collection('cells');
+
+exports.addData = function(cellId, dataObj){
+	var cellRef = cellsCollect.doc(cellId);
+	return new Promise((resolve, reject) => {
+		cellRef.get()
+			.then(doc => {
+				if (doc.exists) {
+					// Atomically add a new region to the "regions" array field.
+					dataObj.created_at = (new Date()).getTime();
+					cellRef.collection("data").add(dataObj)
+					.then(() => { resolve() });
+				} else reject("cell is not exist");
+			});
+	});
+};

@@ -27,7 +27,30 @@ module.exports = function(app, passport) {
     // =====================================
     // API =================================
     // =====================================
-    
+    app.post('/api/push', function (req, res, next) {
+        var formbody = req.body;
+        var cellId;
+        var data = {};
+        Object.keys(formbody).forEach( (key) => {
+            if ( key == "WorkSheetName" ) cellId = formbody[key];
+            else if ( key == "method" ) {}  // ignore
+            else{
+                var value = parseFloat(formbody[key]);
+                data[key] = isNaN(value) ? formbody[key] : value;
+            }
+        } );
+
+        if (cellId) {
+            interface.addData(cellId, data)
+                .then( () => { res.status(200).send("OK") } )
+                .catch(err => {
+                    res.status(500).json({error: "Internal server error: " + err});
+                });
+        } else {
+            res.status(400).send("WorkSheetName is not set");   
+        }
+    });
+
 
     // =====================================
     // CONSOLE =============================
