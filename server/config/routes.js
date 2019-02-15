@@ -32,13 +32,10 @@ module.exports = function(app, passport) {
     // =====================================
     // CONSOLE =============================
     // =====================================
-    app.get('/', function (req, res, next) {
-        res.render(path.resolve(__dirname, '../', 'views/index.ejs'));
-    });
     // show the login form
     app.get('/login', function(req, res) {
         // render the page and pass in any flash data if it exists
-        res.render(path.resolve(__dirname, '../', 'views/login.ejs'));
+        res.render(path.resolve(app.get("views"), 'login.ejs'));
     });
     // show the logout view
     app.get('/logout', function(req, res) {
