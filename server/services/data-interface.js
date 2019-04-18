@@ -20,17 +20,25 @@ var db = admin.firestore();
 
 var cellsCollect = db.collection('cells');
 
+var cellExistMap = {};
+
 exports.addData = function(cellId, dataObj){
 	var cellRef = cellsCollect.doc(cellId);
+	
+	// default
+	var next = Promise.resolve();
+	if ( typeof cellExistMap[cellId] == 'undefined' ) {
+		next = cellRef.get().then(doc => { cellExistMap[cellId] = !!doc.exists; });
+	} 
+
 	return new Promise((resolve, reject) => {
-		cellRef.get()
-			.then(doc => {
-				if (doc.exists) {
-					// Atomically add a new region to the "regions" array field.
-					dataObj.created_at = (new Date()).getTime();
-					cellRef.collection("data").add(dataObj)
-					.then(() => { resolve() });
-				} else reject("cell is not exist");
-			});
+		next.then(function(){
+			if ( cellExistMap[cellId] ) {
+				// get current time
+				dataObj.created_at = (new Date()).getTime();
+				cellRef.collection("data").add(dataObj).then(() => { resolve() });
+			} else reject("cell is not exist");
+		});
 	});
 };
+
