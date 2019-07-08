@@ -42,12 +42,18 @@ module.exports = function(app, passport) {
 
         if (cellId) {
             interface.addData(cellId, data)
-                .then( () => { res.status(200).send("OK") } )
+                .then( () => { 
+                    console.log("[cellId: " + cellId + "] Insert OK.");
+                    res.status(200).send("OK");
+                } )
                 .catch(err => {
-                    res.status(500).json({error: "Internal server error: " + err});
+                    let errorObj = {error: "Internal server error: " + err};
+                    console.error(errorObj);
+                    res.status(500).json(errorObj);
                 });
         } else {
-            res.status(400).send("WorkSheetName is not set");   
+            console.error("WorkSheetName is not set");
+            res.status(400).send("WorkSheetName is not set");
         }
     });
 
