@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <% include partials/head %>
+{% extends "base.njk" %}
 
-    <title>登入</title>
-    
-</head>
+{% block headtitle %}Login{% endblock %}
 
-<body class="gray-bg">
+{% block content %}
 
     <div class="loginColumns animated fadeInDown">
         <div class="row">
@@ -45,6 +40,4 @@
         </div>
     </div>
 
-</body>
-
-</html>
+{% endblock %}

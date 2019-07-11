@@ -17,19 +17,15 @@ module.exports = function (app, passport) {
 	app.disable('x-powered-by');
 	app.set('views', path.join(__dirname, '..', 'views'));
 	app.set('case sensitive routing', true);
-	app.set('view engine', 'ejs');
 	app.set('view cache', false);
+	app.set('view engine', 'njk');
 
-	if(isProduction) {
-		// temprorary did it like this, because we dont have DB yet.
-		app.use(session({
-			secret: 'beebetter',
-			resave: false,
-			cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 days
-		})); // session secret  
-	}else{
-		app.use(session({ secret: 'ilovescotchscotchyscotchscotch' })); // session secret  
-	}
+	app.use(session({ 
+		secret: '3EdCvFr$5TgBnHy^7Ujm', 
+		resave: false,
+		cookie: { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true },
+		saveUninitialized: true
+	})); // session secret  
 
 	app.use(passport.initialize());
 	app.use(passport.session()); // persistent login sessions

@@ -5,6 +5,7 @@ var express = require('express');
 var path = require('path');
 var utils = require('../services/utils');
 var interface = require('../services/data-interface');
+var nunjucks = require('nunjucks');
 
 // route middleware to make sure a user is logged in
 function loginRequired(req, res, next) {
@@ -18,6 +19,12 @@ function loginRequired(req, res, next) {
 }
 
 module.exports = function(app, passport) {
+
+    var nunEnv = nunjucks.configure(app.get('views'), {
+        autoescape: true,
+        watch: true,
+        express: app
+    });
 
     // =====================================
     // Static Files ========================
@@ -64,7 +71,8 @@ module.exports = function(app, passport) {
     // show the login form
     app.get('/login', function(req, res) {
         // render the page and pass in any flash data if it exists
-        res.render(path.resolve(app.get("views"), 'login.ejs'));
+        res.render('login');
+        // res.render(path.resolve(app.get("views"), 'login.ejs'));
     });
     // show the logout view
     app.get('/logout', function(req, res) {
