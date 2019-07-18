@@ -18,9 +18,30 @@ if ( isProduction ) {
 
 var db = admin.firestore();
 
+var usersCollect = db.collection('users');
 var cellsCollect = db.collection('cells');
 
 var cellExistMap = {};
+
+exports.validUser = function(email, password){
+	var userRef = usersCollect.doc(email);
+	return new Promise((resolve, reject) => {
+		userRef.get()
+			.then(doc => {
+				var data;
+				if ( doc.exists && (data = doc.data()) && data.pass === md5(password) ) {
+					var resdata = {
+						id: doc.id,
+						superuser: data.superuser,
+						name: data.name,
+						cells: (data.cells || []).map(docRef => docRef.id)
+					};
+					resolve(resdata);
+				}
+				reject("Email or Password is not valid.");
+			});
+	});
+};
 
 exports.addData = function(cellId, dataObj){
 	var cellRef = cellsCollect.doc(cellId);

@@ -27,39 +27,40 @@ module.exports = function(passport) {
     // passport needs ability to serialize and unserialize users out of session
 
     // used to serialize the user for the session
-    // passport.serializeUser(function(user, done) {
-    //     done(null, user.id);
-    // });
+    passport.serializeUser(function(user, done) {
+        done(null, user.id);
+    });
 
     // used to deserialize the user
-    // passport.deserializeUser(function(id, done) {
-    //     done(null, id);
-    // });
+    passport.deserializeUser(function(id, done) {
+        done(null, id);
+    });
 
     // =========================================================================
     // LOCAL LOGIN =============================================================
     // =========================================================================
     // we are using named strategies since we have one for login and one for signup
     // by default, if there was no name, it would just be called 'local'
-
-    // passport.use(
-    //     'local-login',
-    //     new LocalStrategy({
-    //         // by default, local strategy uses username and password, we will override with email
-    //         usernameField : 'username',
-    //         passwordField : 'password',
-    //         passReqToCallback : true // allows us to pass back the entire request to the callback
-    //     },
-    //     function(req, username, password, done) { // callback with email and password from our form
-    //         interface.findUser(username, password).then(
-    //             function(user){
-    //                 console.log("login user:" + user);
-    //                 checkAndUpdateCookie(req, req.res);
-    //                 done( null, user );
-    //             },
-    //             function(err){ return done( null, false, { message: err } ); }
-    //         );
-    //     })
-    // );
+    passport.use(
+        'local-login',
+        new LocalStrategy({
+            // by default, local strategy uses username and password, we will override with email
+            usernameField : 'email',
+            passwordField : 'password',
+            passReqToCallback : true // allows us to pass back the entire request to the callback
+        },
+        function(req, email, password, done) { // callback with email and password from our form
+            interface.validUser(email, password).then(
+                function(user){
+                    // console.log("login user:" + user);
+                    // utils.setCookie(req.res, uuidv4(), 1000 * 60 * 60 * 24 * 7); // 1 week
+                    done( null, user );
+                },
+                function(err){ 
+                    return done( null, false, req.flash('message', err) );
+                }
+            );
+        })
+    );
 
 }; 

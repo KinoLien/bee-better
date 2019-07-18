@@ -71,15 +71,20 @@ module.exports = function(app, passport) {
     // show the login form
     app.get('/login', function(req, res) {
         // render the page and pass in any flash data if it exists
-        res.render('login');
+        res.render('login', { message: req.flash('message') } );
         // res.render(path.resolve(app.get("views"), 'login.ejs'));
     });
     // show the logout view
-    app.get('/logout', function(req, res) {
+    app.get('/logout', loginRequired, function(req, res) {
         req.logout();
         res.redirect('/');
     });
 
+    app.get('/', loginRequired, function(req, res) { res.redirect('/dashboard'); });
+
+    app.get('/dashboard', loginRequired, function(req, res) {
+        res.render('menu/dashboard');
+    });
 
     // process the login form
     app.post('/login', passport.authenticate('local-login', {

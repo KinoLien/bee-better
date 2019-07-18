@@ -35,7 +35,7 @@
 	{% endblock %}
 </head>
 
-<body class="gray-bg">
+<body class="{% block bodycls %}{% endblock %}">
 
 	<!-- Content -->
 	{% block content %}
@@ -43,7 +43,7 @@
 
     {% block bodyjs %}
 	{% endblock %}
-	
+
 </body>
 
 </html>
