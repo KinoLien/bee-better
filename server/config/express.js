@@ -43,6 +43,10 @@ module.exports = function (app, passport) {
 	//   next();
 	// }); 
 
+	if ( !isProduction ) {
+		app.use('/assets', express.static(path.join(__dirname, '../..', 'assets')));
+	}
+
 	// I am adding this here so that the Heroku deploy will work
 	// Indicates the app is behind a front-facing proxy,
 	// and to use the X-Forwarded-* headers to determine the connection and the IP address of the client.
