@@ -6,6 +6,8 @@ var uuid = require('node-uuid');
 
 var strkey = "_bb";
 
+function lessTenAddZero(v) { return v < 10? ("0" + v) : v; };
+
 exports.getCookie = function(req){
 	var res = null,
 		cookiePairs = [];
@@ -56,5 +58,24 @@ exports.base64_encode = function(file){
     var bitmap = fs.readFileSync(file);
     // convert binary data to base64 encoded string
     return new Buffer(bitmap).toString('base64');
+};
+
+exports.toFridayFormat = function(dte){
+	var year = dte.getUTCFullYear(),
+		month = dte.getUTCMonth() + 1,
+		day = dte.getUTCDate(),
+		hour = dte.getUTCHours(),
+		min = dte.getUTCMinutes(),
+		sec = dte.getUTCSeconds();
+	return parseInt( [
+		year.toString().slice(2), lessTenAddZero(month), lessTenAddZero(day), 
+		lessTenAddZero(hour), lessTenAddZero(min), lessTenAddZero(sec)
+	].join("") );
+};
+
+exports.isIsoDate = function (str) {
+	if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(str)) return false;
+	var d = new Date(str); 
+	return d.toISOString()===str;
 };
 
