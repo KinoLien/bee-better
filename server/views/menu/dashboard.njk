@@ -28,6 +28,9 @@
                 <label class="control-label" for="chosen-devices">Devices</label>
                 <select data-placeholder="Choose a Device..." class="chosen-select" id="chosen-devices">
                 	<option value></option>
+                	{% for dev in devices %}
+                    <option value="{{ dev }}">{{ dev }}</option>
+                    {% endfor %}
                 </select>
             </div>
         </div>

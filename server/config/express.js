@@ -36,12 +36,17 @@ module.exports = function (app, passport) {
 	app.use(bodyParser.urlencoded({limit: '50mb', extended: true})); // for parsing application/x-www-form-urlencoded
 	app.use(bodyParser.json({limit: '50mb'}));
 
-	// common ejs properties
-	// app.use(function(req, res, next){
-	//   res.locals.isDev = !isProduction;
-	//   res.locals.login = req.isAuthenticated();
-	//   next();
-	// }); 
+	// common nunjucks properties
+	app.use(function(req, res, next){
+	  res.locals.isDev = !isProduction;
+	  res.locals.login = req.isAuthenticated();
+	  if ( res.locals.login ) {
+	  	res.locals.devices = req.user.cells || [];
+	  	res.locals.userid = req.user.id;
+	  	res.locals.username = req.user.name;
+	  }
+	  next();
+	}); 
 
 	if ( !isProduction ) {
 		app.use('/assets', express.static(path.join(__dirname, '../..', 'assets')));
