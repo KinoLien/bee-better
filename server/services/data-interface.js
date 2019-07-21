@@ -63,3 +63,38 @@ exports.addData = function(cellId, dataObj){
 	});
 };
 
+exports.getCellData = function(cellId, datestart, dateend){
+	var cellDataRef = cellsCollect.doc(cellId).collection("data");
+	var endDate, startDate;
+
+    // parse end
+    if (dateend && utils.isIsoDate(dateend)) {
+        endDate = new Date(dateend);
+    } else {
+        endDate = new Date();   // now
+    }
+
+    // parse start
+    if (datestart && utils.isIsoDate(datestart)){
+        startDate = new Date(datestart);
+    } else {
+        startDate = new Date(endDate.getTime() - 3 * 24 * 60 * 60 * 1000); // 3 days ago
+    }
+
+	var dataQuery = cellDataRef
+		.where('Time', '>=', utils.toFridayFormat(startDate))
+		.where('Time', '<=', utils.toFridayFormat(endDate));
+
+	return new Promise((resolve, reject) => {
+		dataQuery.get()
+			.then(querySnapshot => {
+				var results = [];
+				querySnapshot.forEach(doc => {
+					var data = doc.data();
+					data["Time_convert"] = utils.fridayFormatToStamp(data["Time"]);
+					results.push(data);
+				});
+				resolve(results);
+			});
+	});
+};

@@ -79,3 +79,11 @@ exports.isIsoDate = function (str) {
 	return d.toISOString()===str;
 };
 
+exports.fridayFormatToStamp = function(num){
+	var str = num.toString();
+	if ( str.length != 12 ) return null;
+	return (new Date([
+			[ "20" + str.slice(0, 2), str.slice(2, 4), str.slice(4, 6) ].join("-"), 
+			[ str.slice(6, 8), str.slice(8, 10), str.slice(10, 12) ].join(":")
+		].join(" "))).getTime();
+};

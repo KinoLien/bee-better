@@ -1,5 +1,8 @@
 
-var dateRangePicker = $("#daterangePicker");
+var dateRangePicker = $("#daterangePicker"),
+	deviceSelect = $("#chosen-device"),
+	propertiesSelect = $("#chosen-properties"),
+	flotLineChart = $("#flot-line-chart");
 
 var maxDate = new Date();
 
@@ -29,3 +32,62 @@ dateRangePicker.daterangepicker({
 });
 
 $(".chosen-select").chosen({width: '100%'});
+
+var plotOptions = {
+	xaxis: {
+    	mode: 'time',
+    	timezone: "browser"
+    },
+    legend: {
+        show: false
+    },
+    colors: ["#1ab394"],
+    grid: {
+        color: "#999999",
+        clickable: true,
+        tickColor: "#D4D4D4",
+        borderWidth:0,
+        hoverable: true //IMPORTANT! this is needed for tooltip to work,
+    },
+    tooltip: true,
+    tooltipOpts: {
+        content: "time: %x  value: %y",
+        xDateFormat: "%H:%M"
+    }
+};
+
+var currentDevice, currentEnd, currentStart;
+
+function triggerLoadChartData(){
+	var rangeData = dateRangePicker.data('daterangepicker');
+
+	var deviceName = deviceSelect.val();
+	var endISOStr = rangeData.endDate.toISOString();
+	var startISOStr = rangeData.startDate.toISOString();
+
+	if ( currentDevice == deviceName && currentEnd == endISOStr && currentStart == startISOStr) return;
+	else {
+		currentDevice = deviceName; currentEnd = endISOStr; currentStart = startISOStr;
+	}
+
+	var params = {
+		end: currentEnd,
+		start: currentStart
+	}
+
+	// open loading spinner
+	flotLineChart.parents(".ibox-content").addClass("sk-loading");
+
+	Promise.resolve($.getJSON("/api/cells/" + deviceName + "?" + encodeParamPairs(params)))
+		.then(function(res){ 
+			console.log(res);
+
+			// close loading spinner
+			flotLineChart.parents(".ibox-content").removeClass("sk-loading");
+		});
+}
+
+dateRangePicker.on('apply.daterangepicker', triggerLoadChartData);
+
+deviceSelect.change(triggerLoadChartData);
+

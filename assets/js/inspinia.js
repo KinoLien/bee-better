@@ -289,4 +289,8 @@ function WinMove() {
         .disableSelection();
 }
 
-
+function encodeParamPairs(param){
+    return Object.keys(param)
+        .map(function(key){ return key + "=" + encodeURIComponent(param[key]); })
+        .join('&');
+}
