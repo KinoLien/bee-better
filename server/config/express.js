@@ -44,6 +44,7 @@ module.exports = function (app, passport) {
 	  	res.locals.devices = req.user.cells || [];
 	  	res.locals.userid = req.user.id;
 	  	res.locals.username = req.user.name;
+	  	res.locals.currentpath = req.path;
 	  }
 	  next();
 	}); 
