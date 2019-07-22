@@ -83,7 +83,8 @@ exports.getCellData = function(cellId, datestart, dateend){
 
 	var dataQuery = cellDataRef
 		.where('Time', '>=', utils.toFridayFormat(startDate))
-		.where('Time', '<=', utils.toFridayFormat(endDate));
+		.where('Time', '<=', utils.toFridayFormat(endDate))
+		.orderBy('Time');
 
 	return new Promise((resolve, reject) => {
 		dataQuery.get()
@@ -91,7 +92,7 @@ exports.getCellData = function(cellId, datestart, dateend){
 				var results = [];
 				querySnapshot.forEach(doc => {
 					var data = doc.data();
-					data["Time_convert"] = utils.fridayFormatToStamp(data["Time"]);
+					data["Time_convert"] = utils.fridayFormatToISOString(data["Time"]);
 					results.push(data);
 				});
 				resolve(results);
