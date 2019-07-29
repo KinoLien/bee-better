@@ -64,6 +64,12 @@ module.exports = function(app, passport) {
         }
     });
 
+    app.get('/api/cells/:cellId', loginRequired, function(req, res) {
+        interface.getCellData(req.params.cellId, req.query.start, req.query.end)
+            .then(results => {
+                res.status(200).json(results);
+            });
+    });
 
     // =====================================
     // CONSOLE =============================
