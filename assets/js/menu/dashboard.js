@@ -8,6 +8,8 @@ var maxDate = new Date();
 
 var initDateRange = [moment().subtract(3, 'days'), moment()];
 
+var maxChartPoints = 500;
+
 // for new daterange
 dateRangePicker.daterangepicker({
 	// minDate: minDate,
@@ -75,21 +77,25 @@ function drawPlotChart(){
 }
 
 function triggerLoadChartData(){
-	var rangeData = dateRangePicker.data('daterangepicker');
+	var rangeDate = dateRangePicker.data('daterangepicker');
 
 	var deviceName = deviceSelect.val();
-	var endISOStr = rangeData.endDate.toISOString();
-	var startISOStr = rangeData.startDate.toISOString();
+	var endISOStr = rangeDate.endDate.toISOString();
+	var startISOStr = rangeDate.startDate.toISOString();
 
 	if ( currentDevice == deviceName && currentEnd == endISOStr && currentStart == startISOStr) return;
 	else {
 		currentDevice = deviceName; currentEnd = endISOStr; currentStart = startISOStr;
 	}
 
+	var rangeMaxTime = rangeDate.endDate.toDate().getTime();
+	var rangeMinTime = rangeDate.startDate.toDate().getTime();
+	var rangeDateDiff = rangeMaxTime - rangeMinTime;
+
 	var params = {
 		end: currentEnd,
 		start: currentStart
-	}
+	};
 
 	// open loading spinner
 	flotLineChart.parents(".ibox-content").addClass("sk-loading");
@@ -121,16 +127,39 @@ function triggerLoadChartData(){
 				minStamp = maxStamp = ( res[0] ? res[0]["Time_localstamp"] : 0 );
 			}
 
+			var slicePoints = Math.min( maxChartPoints, rangeDateDiff / unitStep );
+			if ( slicePoints == maxChartPoints ) {
+				unitStep = Math.floor( rangeDateDiff / slicePoints );
+			}
+
+			var pointStamps = [], stampTick = minStamp;
+			// fit stamps before minStamp
+			while( stampTick - rangeMinTime >= unitStep ) {
+				stampTick -= unitStep;
+				pointStamps.unshift(stampTick);
+			}
+			// fit stamps after minStamp
+			stampTick = minStamp;
+			do {
+				pointStamps.push(stampTick);
+				stampTick += unitStep;
+			} while( stampTick <= rangeMaxTime );
+
+			// init stamp to items
+			var stampToItems = {};
+			pointStamps.forEach(function(stamp){
+				stampToItems[stamp] = [];
+			});
+
 			// time alignment
-			var stampToItem = {};
+			var firstPointStamp = pointStamps[0];
 			res.forEach(function(item){
 				var stamp = item["Time_localstamp"];
-				var tickIndex = Math.round( ( stamp - minStamp ) / unitStep );
-				var correctStamp = minStamp + tickIndex * unitStep;
-				if ( correctStamp != stamp && Math.abs(correctStamp - stamp) <= unitStep / 2 ) {
-					item["Time_localstamp"] = stamp = correctStamp;
-				}
-				stampToItem[stamp] = item;
+
+				// find index
+				var pointStampIdx = Math.round( Math.abs( stamp - firstPointStamp ) / unitStep );
+
+				stampToItems[ pointStamps[pointStampIdx] ].push(item);
 			});
 
 			// propKeyMapData init
@@ -145,20 +174,29 @@ function triggerLoadChartData(){
 
 			var propKeys = Object.keys(propKeyMapData);
 
-			// for each tick
-			for( var tick = minStamp, idx = 0; tick <= maxStamp; tick += unitStep, idx++ ) {
-				// handler(tick, idx);
-				var item = stampToItem[tick];
-				if ( item ) {
+			pointStamps.forEach(function(pointStamp){
+				var items = stampToItems[pointStamp];
+				if ( items && items.length ) {
 					propKeys.forEach(function(propKey){
-						propKeyMapData[propKey].data.push( [ tick, item[propKey] ] );
+
+						var propAvg = items.map(function(item){ return item[propKey]; })
+							.reduce(function(acc, cur){ 
+								if ( isNaN(cur) ) return acc;
+								else if ( isNaN(acc) ) return cur;
+								else return acc + cur;
+							})
+							/ items.length;
+
+						propAvg = isNaN(propAvg) ? null : propAvg;
+
+						propKeyMapData[propKey].data.push( [ pointStamp, propAvg ] );
 					});
 				} else {
 					propKeys.forEach(function(propKey){
-						propKeyMapData[propKey].data.push( [ tick, null ] );
+						propKeyMapData[propKey].data.push( [ pointStamp, null ] );
 					});
 				}
-			}
+			});
 
 			drawPlotChart();
 
