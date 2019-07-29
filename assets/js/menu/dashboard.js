@@ -10,6 +10,8 @@ var initDateRange = [moment().subtract(3, 'days'), moment()];
 
 var maxChartPoints = 500;
 
+var currentPlot = null;
+
 // for new daterange
 dateRangePicker.daterangepicker({
 	// minDate: minDate,
@@ -53,10 +55,34 @@ var plotOptions = {
     },
     tooltip: true,
     tooltipOpts: {
-        content: "time: %x  value: %y.2",
-        xDateFormat: "%H:%M"
+        content: function(data, x, y, dataObject) {
+        	if ( currentPlot ) {
+        		var XdataIndex = dataObject.dataIndex;
+        		var currentAllData = currentPlot.getData();
+        		var outputs = [];
+        		currentAllData.forEach(function(series){
+        			outputs.push(series.label + ": " + parseFloat(series.data[XdataIndex][1]).toFixed(2) );
+        		});
+        		return "<b>%x</b> <br/>" + outputs.join("<br/>");
+        	} else return null;
+	    },
+        xDateFormat: "%m/%d %H:%M"
     }
 };
+
+flotLineChart.bind("plothover", function (event, pos, item) {
+	if ( currentPlot ) {
+		currentPlot.getOptions().grid.markings = [{
+			xaxis: {
+				from: pos.x,
+				to: pos.x
+			},
+			color: "#ececec"
+		}];
+		currentPlot.setupGrid();
+		currentPlot.draw();
+	}
+});
 
 var propKeyMapData = null;
 
@@ -72,14 +98,17 @@ function drawPlotChart(){
 		});
 	}
 	if (datasets.length) {
-		$.plot(flotLineChart, datasets, plotOptions);
-	}
+		currentPlot = $.plot(flotLineChart, datasets, plotOptions);
+	} else currentPlot = null;
 }
 
 function triggerLoadChartData(){
 	var rangeDate = dateRangePicker.data('daterangepicker');
 
 	var deviceName = deviceSelect.val();
+
+	if ( !deviceName ) return;
+
 	var endISOStr = rangeDate.endDate.toISOString();
 	var startISOStr = rangeDate.startDate.toISOString();
 
