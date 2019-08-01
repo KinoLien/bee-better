@@ -188,6 +188,7 @@ function triggerLoadChartData(){
 				// find index
 				var pointStampIdx = Math.round( Math.abs( stamp - firstPointStamp ) / unitStep );
 
+				if ( pointStampIdx >= pointStamps.length ) pointStampIdx = pointStamps.length - 1;
 				stampToItems[ pointStamps[pointStampIdx] ].push(item);
 			});
 
