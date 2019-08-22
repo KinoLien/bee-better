@@ -42,10 +42,13 @@ var plotOptions = {
     	mode: 'time',
     	timezone: "browser"
     },
+    yaxis: {
+    	max: 100
+    },
     legend: {
         show: true
     },
-    colors: ["#1ab394"],
+    colors: ["#c62828", "#283593", "#00695C", "#F9A825", "#37474F", "#6A1B9A", "#0277BD", "#558B2F", "#EF6C00", "#4E342E"],
     grid: {
         color: "#999999",
         clickable: true,
