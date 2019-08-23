@@ -105,6 +105,21 @@ function drawPlotChart(){
 	} else currentPlot = null;
 }
 
+function tuneChartHeight(){
+	var chartWrap = flotLineChart.parent(),
+		iboxWrap = chartWrap.parents(".ibox"),
+		mainWrap = iboxWrap.parents(".wrapper-content");
+
+	var iboxStyles = getComputedStyle(iboxWrap.get(0)),
+		mainStyles = getComputedStyle(mainWrap.get(0));
+
+	var calculateHeight = $(window).height() - chartWrap.offset().top - 
+		parseInt(iboxStyles["margin-bottom"]) - parseInt(mainStyles["padding-top"]) - 
+		parseInt(mainStyles["padding-bottom"]);
+
+	chartWrap.height(calculateHeight);
+}
+
 function triggerLoadChartData(){
 	var rangeDate = dateRangePicker.data('daterangepicker');
 
@@ -243,3 +258,6 @@ dateRangePicker.on('apply.daterangepicker', triggerLoadChartData);
 deviceSelect.change(triggerLoadChartData);
 
 propertiesSelect.change(drawPlotChart);
+
+tuneChartHeight();
+
