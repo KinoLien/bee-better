@@ -3,10 +3,26 @@ var url = require('url');
 var md5 = require('md5');
 var fs = require('fs');
 var uuid = require('node-uuid');
+const path = require('path');
 
 var strkey = "_bb";
 
 function lessTenAddZero(v) { return v < 10? ("0" + v) : v; };
+
+function walkSync (dir, filelist = []) {
+    fs.readdirSync(dir).forEach(file => {
+    	if ( file && file[0] == "." ) return;	// ignore hidden files
+        const dirFile = path.join(dir, file);
+        try {
+            filelist = walkSync(dirFile, filelist);
+        }
+        catch (err) {
+            if (err.code === 'ENOTDIR' || err.code === 'EBUSY') filelist = [...filelist, dirFile];
+            else throw err;
+        }
+    });
+    return filelist;
+}
 
 exports.getCookie = function(req){
 	var res = null,
@@ -60,7 +76,7 @@ exports.base64_encode = function(file){
     return new Buffer(bitmap).toString('base64');
 };
 
-exports.toFridayFormat = function(dte){
+function toFridayFormat(dte){
 	var year = dte.getUTCFullYear(),
 		month = dte.getUTCMonth() + 1,
 		day = dte.getUTCDate(),
@@ -71,7 +87,9 @@ exports.toFridayFormat = function(dte){
 		year.toString().slice(2), lessTenAddZero(month), lessTenAddZero(day), 
 		lessTenAddZero(hour), lessTenAddZero(min), lessTenAddZero(sec)
 	].join("") );
-};
+}
+
+exports.toFridayFormat = toFridayFormat;
 
 exports.isIsoDate = function (str) {
 	if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(str)) return false;
@@ -88,4 +106,17 @@ exports.fridayFormatToISOString = function(num){
 			[ str.slice(6, 8), str.slice(8, 10), str.slice(10, 12) ].join(":"),
 			".000Z"
 		].join("");
+};
+
+exports.assetsStampMap = function(){
+	var res = {};
+	var rootPath = process.cwd();
+    var filelist = walkSync(rootPath + "/assets");
+    filelist.forEach(function(path){
+    	var key = path.slice(rootPath.length);
+        var stats = fs.statSync(path);
+        var mtime = stats.mtime;
+        res[key] = toFridayFormat(new Date(mtime));
+    });
+    return res;
 };

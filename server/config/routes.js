@@ -26,6 +26,15 @@ module.exports = function(app, passport) {
         express: app
     });
 
+    var assetsMap = utils.assetsStampMap();
+    
+    nunEnv.addFilter("appendStamp", function(path){
+        if (assetsMap[path]) {
+            path += '?t=' + assetsMap[path].toString();
+        }
+        return path;
+    });
+
     // =====================================
     // Static Files ========================
     // =====================================

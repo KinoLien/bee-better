@@ -4,7 +4,7 @@
 {% block headtitle %}Dashboard{% endblock %}
 
 {% block headcss %}
-<link href="/assets/css/plugins/chosen/bootstrap-chosen.css" rel="stylesheet">
+<link href="{{ '/assets/css/plugins/chosen/bootstrap-chosen.css' | appendStamp }}" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 {% endblock %}
 
@@ -86,5 +86,5 @@
 {% endblock %}
 
 {% block bodyjs %}
-<script src="/assets/js/menu/dashboard.js"></script>
+<script src="{{ '/assets/js/menu/dashboard.js' | appendStamp }}"></script>
 {% endblock %}
