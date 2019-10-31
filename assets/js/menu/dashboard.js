@@ -207,7 +207,9 @@ function triggerLoadChartData(){
 				var pointStampIdx = Math.round( Math.abs( stamp - firstPointStamp ) / unitStep );
 
 				if ( pointStampIdx >= pointStamps.length ) pointStampIdx = pointStamps.length - 1;
-				stampToItems[ pointStamps[pointStampIdx] ].push(item);
+
+				var stkey = pointStamps[pointStampIdx];
+				if ( stampToItems[stkey] ) stampToItems[stkey].push(item);
 			});
 
 			// propKeyMapData init
