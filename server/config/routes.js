@@ -101,6 +101,13 @@ module.exports = function(app, passport) {
         res.render('menu/dashboard');
     });
 
+    app.get('/daily/list', loginRequired, function(req, res) {
+        res.render('menu/daily/list');
+    });
+
+    app.get('/daily/create', loginRequired, function(req, res) {
+        res.render('menu/daily/create');
+    });
     // process the login form
     app.post('/login', passport.authenticate('local-login', {
         successRedirect : '/', // redirect to the secure profile section

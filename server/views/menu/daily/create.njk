@@ -1,0 +1,92 @@
+
+{% extends "layout.njk" %}
+
+{% block headtitle %}Daily - Create{% endblock %}
+
+{% block headjs %}
+{{ super() }}
+<script src="{{ '/assets/js/widgets/device-chart.js' | appendStamp }}"></script>
+{% endblock %}
+
+{% block innercontent %}
+<form method="POST" action="{{ currentpath }}">
+    <div class="ibox-content m-b-sm border-bottom">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label class="control-label" for="daterangePicker">Date</label>
+                    <input type="text" id="daterangePicker" name="date" class="form-control" required>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label class="control-label" for="chosen-device">Device</label>
+                    <select data-placeholder="Choose a Device..." class="chosen-select" name="device" id="chosen-device" required>
+                        <option value></option>
+                        {% for dev in devices %}
+                        <option value="{{ dev }}">{{ dev }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="control-label" for="chosen-properties">Properties</label>
+                    <select data-placeholder="Choose Properties" class="chosen-select" name="props" multiple id="chosen-properties" required>
+                        <option selected value="Tem1">Tem1</option>
+                        <option value="Tem2">Tem2</option>
+                        <option value="Tem3">Tem3</option>
+                        <option value="Tem4">Tem4</option>
+                        <option selected value="Hum1">Hum1</option>
+                        <option value="Hum2">Hum2</option>
+                        <option value="Hum3">Hum3</option>
+                        <option value="Hum4">Hum4</option>
+                        <option selected value="Vol1">Vol1</option>
+                        <option value="Vol2">Vol2</option>
+                        <option value="Vol3">Vol3</option>
+                        <option value="Vol4">Vol4</option>
+                        <option selected value="Weight">Weight</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox-content m-b-sm border-bottom">
+                {% include "templates/spinner/cube-grid.html" %}
+                <div class="flot-chart" style="min-height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox-content m-b-sm border-bottom form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Title / Summary</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Content / Description</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" name="content" rows="7" style="resize: vertical; min-height:150px;"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row m-b-md">
+        <div class="col-lg-12">
+            <button type="submit" class="btn btn-primary pull-right">Create Log</button>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
+
+{% block bodyjs %}
+<script src="{{ '/assets/js/menu/daily/create.js' | appendStamp }}"></script>
+{% endblock %}

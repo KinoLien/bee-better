@@ -52,6 +52,17 @@
                 <li {% if currentpath == "/dashboard" %}class="active"{% endif %}>
                     <a href="/dashboard"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard</span></a>
                 </li>
+                <li {% if currentpath|isGroupWith("/daily") %}class="active"{% endif %}>
+                    <a href="#"><i class="fa fa-bar-chart-o"></i> <span class="nav-label">Daily Logs</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li {% if currentpath == "/daily/list" %}class="active"{% endif %}>
+                            <a href="/daily/list">List</a>
+                        </li>
+                        <li {% if currentpath == "/daily/create" %}class="active"{% endif %}>
+                            <a href="/daily/create">Create</a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </nav>
