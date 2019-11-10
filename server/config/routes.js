@@ -35,6 +35,10 @@ module.exports = function(app, passport) {
         return path;
     });
 
+    nunEnv.addFilter("isGroupWith", function(cur, target){
+        return cur.substring(0, target.length) == target;
+    });
+
     // =====================================
     // Static Files ========================
     // =====================================
@@ -108,6 +112,21 @@ module.exports = function(app, passport) {
     app.get('/daily/create', loginRequired, function(req, res) {
         res.render('menu/daily/create');
     });
+    app.post('/daily/create', loginRequired, async function(req, res) {
+        let cellId = req.body.device;
+        let data = {
+            date: req.body.date,
+            props: req.body.props,
+            title: req.body.title,
+            content: req.body.content || ""
+        };
+        if ( cellId ) {
+            await interface.addCellLog(cellId, data);
+            console.log("[Log: " + cellId + " " + data.date + "] Insert OK.");
+        }
+        res.redirect('/daily/list');
+    });
+
     // process the login form
     app.post('/login', passport.authenticate('local-login', {
         successRedirect : '/', // redirect to the secure profile section

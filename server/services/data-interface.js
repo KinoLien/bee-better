@@ -99,3 +99,23 @@ exports.getCellData = function(cellId, datestart, dateend){
 			});
 	});
 };
+
+exports.addCellLog = function(cellId, logObj){
+	var cellRef = cellsCollect.doc(cellId);
+	
+	// default
+	var next = Promise.resolve();
+	if ( typeof cellExistMap[cellId] == 'undefined' ) {
+		next = cellRef.get().then(doc => { cellExistMap[cellId] = !!doc.exists; });
+	} 
+
+	return new Promise((resolve, reject) => {
+		next.then(function(){
+			if ( cellExistMap[cellId] ) {
+				// get current time
+				logObj.created_at = (new Date()).getTime();
+				cellRef.collection("logs").add(logObj).then(() => { resolve() });
+			} else reject("cell is not exist");
+		});
+	});
+};
