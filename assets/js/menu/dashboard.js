@@ -82,5 +82,13 @@ propertiesSelect.change(function(){
 tuneChartHeight();
 
 $(".line-chart a[csv-export]").click(function(){ 
-	flotLineChart.exportRaw(propertiesSelect.val(), deviceSelect.val());
+	var rangeDate = dateRangePicker.data('daterangepicker'),
+		deviceName = deviceSelect.val(),
+		filename = [
+			deviceName, 
+			rangeDate.startDate.format("YYMMDDHHmm"), 
+			rangeDate.endDate.format("YYMMDDHHmm")
+		].join("_");
+	
+	flotLineChart.exportRaw(propertiesSelect.val(), filename);
 });
