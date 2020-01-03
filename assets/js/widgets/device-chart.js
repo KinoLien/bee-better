@@ -22,6 +22,22 @@
         return to;
     };
 
+    var _lessTenAddZero = function(v) { return v < 10? ("0" + v) : v; };
+
+    var _stampToDateFormat = function(stamp){
+        var dte = new Date(stamp);
+        var year = dte.getFullYear(),
+            month = dte.getMonth() + 1,
+            day = dte.getDate(),
+            hour = dte.getHours(),
+            min = dte.getMinutes(),
+            sec = dte.getSeconds();
+        return [
+            [year, _lessTenAddZero(month), _lessTenAddZero(day)].join("-"), 
+            [_lessTenAddZero(hour), _lessTenAddZero(min), _lessTenAddZero(sec)].join(":")
+        ].join(" ");
+    };
+
     var _plotOptions = {
         xaxis: {
             mode: 'time',
@@ -190,6 +206,7 @@
 
                 self._pointStamps = pointStamps;
                 self._stampMapData = stampToItems;
+                self._rawData = res;
 
                 self.setPropsShow(opts.props || []);
 
@@ -248,6 +265,37 @@
         });
 
         self._plot = $.plot(self._el, datasets, self._plotOps);
+    };
+
+    dc.prototype.exportRaw = function(props, filename){
+        var self = this;
+        if ( !self._rawData || self._rawData.length == 0 ) return;
+
+        var propKeys = props.map(function(item){
+            return typeof item == "string" ? item : item.value;
+        });
+
+        var filteredRaws = self._rawData.map(function(d){
+            var o = { datetime: _stampToDateFormat(d["Time_localstamp"]) };
+            propKeys.forEach(function(k){
+                o[k] = d[k];
+            });
+            return o;
+        });
+
+        filteredRaws.reverse();
+
+        var headers = Object.keys(filteredRaws[0]);
+
+        var csvLines = filteredRaws.map(function(tuple){
+            return headers.map(function(key){ return tuple[key]; }).join(",");
+        });
+
+        // add header
+        csvLines.unshift(headers.join(","));
+        
+        var blob = new Blob([csvLines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+        saveAs(blob, filename + ".csv");
     };
 
     scope.DeviceChart = dc;

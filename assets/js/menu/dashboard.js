@@ -81,3 +81,6 @@ propertiesSelect.change(function(){
 
 tuneChartHeight();
 
+$(".line-chart a[csv-export]").click(function(){ 
+	flotLineChart.exportRaw(propertiesSelect.val(), deviceSelect.val());
+});
