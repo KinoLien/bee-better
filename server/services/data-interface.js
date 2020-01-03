@@ -18,6 +18,35 @@ if ( isProduction ) {
 
 var db = admin.firestore();
 
+// should be set on console and save to db
+var valuesValids = {
+	"Tem1": [0, 100],
+	"Tem2": [0, 100],
+	"Tem3": [0, 100],
+	"Tem4": [0, 100],
+	"Hum1": [0, 100],
+	"Hum2": [0, 100],
+	"Hum3": [0, 100],
+	"Hum4": [0, 100],
+	"Vol1": [0, 100],
+	"Vol2": [0, 100],
+	"Vol3": [0, 100],
+	"Vol4": [0, 100],
+	"Weight": [0, 100]
+};
+
+var filterValidValues = function(obj){
+	var res = {};
+	Object.keys(obj).forEach(function(key){
+		var validSet;
+		if ( validSet = valuesValids[key] ){
+			var val = obj[key];
+			if ( val < validSet[0] || val > validSet[1] ) res[key] = null;
+		}
+	});
+	return res;
+};
+
 var usersCollect = db.collection('users');
 var cellsCollect = db.collection('cells');
 
@@ -92,8 +121,12 @@ exports.getCellData = function(cellId, datestart, dateend){
 				var results = [];
 				querySnapshot.forEach(doc => {
 					var data = doc.data();
-					data["Time_convert"] = utils.fridayFormatToISOString(data["Time"]);
-					results.push(data);
+					var converted = Object.assign(
+						{ "Time_convert": utils.fridayFormatToISOString(data["Time"]) }, 
+						data,
+						filterValidValues(data)
+					);
+					results.push(converted);
 				});
 				resolve(results);
 			});
