@@ -133,8 +133,9 @@ exports.getCellData = function(cellId, datestart, dateend){
 	});
 };
 
-exports.addCellLog = function(cellId, logObj){
+exports.addCellLog = function(ownerId, cellId, logObj){
 	var cellRef = cellsCollect.doc(cellId);
+	var ownerRef = usersCollect.doc(ownerId);
 	
 	// default
 	var next = Promise.resolve();
@@ -147,6 +148,8 @@ exports.addCellLog = function(cellId, logObj){
 			if ( cellExistMap[cellId] ) {
 				// get current time
 				logObj.created_at = (new Date()).getTime();
+				logObj.owner = ownerRef;
+				logObj.cell = cellRef;
 				cellRef.collection("logs").add(logObj).then(() => { resolve() });
 			} else reject("cell is not exist");
 		});

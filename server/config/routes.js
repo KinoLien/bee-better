@@ -116,12 +116,11 @@ module.exports = function(app, passport) {
         let cellId = req.body.device;
         let data = {
             date: req.body.date,
-            props: req.body.props,
             title: req.body.title,
             content: req.body.content || ""
         };
         if ( cellId ) {
-            await interface.addCellLog(cellId, data);
+            await interface.addCellLog(req.user.id, cellId, data);
             console.log("[Log: " + cellId + " " + data.date + "] Insert OK.");
         }
         res.redirect('/daily/list');
