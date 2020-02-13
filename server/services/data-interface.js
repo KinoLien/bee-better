@@ -155,3 +155,23 @@ exports.addCellLog = function(ownerId, cellId, logObj){
 		});
 	});
 };
+
+exports.getCellLogs = function(cellId, datestart, dateend){
+	var cellLogsRef = cellsCollect.doc(cellId).collection("logs");
+
+	var dataQuery = cellLogsRef
+		.where('date', '>=', datestart)
+		.where('date', '<=', dateend)
+		.orderBy('date');
+
+	return new Promise((resolve, reject) => {
+		dataQuery.get()
+			.then(querySnapshot => {
+				var results = [];
+				querySnapshot.forEach(doc => {
+					results.push(doc.data());
+				});
+				resolve(results);
+			});
+	});
+}

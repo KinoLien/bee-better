@@ -59,12 +59,19 @@ function triggerLoadChartData(){
 	// open loading spinner
 	chartWrap.parent().addClass("sk-loading");
 
-	flotLineChart.loadData({
-		deviceName: deviceName,
-		props: propertiesSelect.val(),
-		dateFrom: rangeDate.startDate,
-		dateTo: rangeDate.endDate
-	})
+	Promise.all([
+		flotLineChart.loadData({
+			deviceName: deviceName,
+			props: propertiesSelect.val(),
+			dateFrom: rangeDate.startDate,
+			dateTo: rangeDate.endDate
+		}),
+		Promise.resolve($.getJSON("/api/dailylist/" + deviceName, {
+				start: moment(rangeDate.startDate).format("YYYY-MM-DD"),
+				end: moment(rangeDate.endDate).format("YYYY-MM-DD")
+			}))
+			.then(function(res){ console.log(res); })
+	])
 	.then(function(){
 		// close loading spinner
 		chartWrap.parent().removeClass("sk-loading");

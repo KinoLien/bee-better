@@ -84,6 +84,11 @@ module.exports = function(app, passport) {
             });
     });
 
+    app.get('/api/dailylist/:cellId', loginRequired, async function(req, res) {
+        let reslogs = await interface.getCellLogs(req.params.cellId, req.query.start, req.query.end);
+        res.status(200).json(reslogs);
+    });
+
     // =====================================
     // CONSOLE =============================
     // =====================================
@@ -105,7 +110,9 @@ module.exports = function(app, passport) {
         res.render('menu/dashboard');
     });
 
-    app.get('/daily/list', loginRequired, function(req, res) {
+    app.get('/daily/list', loginRequired, async function(req, res) {
+        // let reslogs = await interface.getCellLogs("01-14");
+        // console.log(reslogs);
         res.render('menu/daily/list');
     });
 
