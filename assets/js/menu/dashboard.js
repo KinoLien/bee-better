@@ -2,13 +2,16 @@
 var dateRangePicker = $("#daterangePicker"),
 	deviceSelect = $("#chosen-device"),
 	propertiesSelect = $("#chosen-properties"),
-	chartWrap = $(".flot-chart");
+	chartWrap = $(".flot-chart"),
+	logTitle = $("#log-title");
 
 var maxDate = new Date();
 
 var initDateRange = [moment().subtract(3, 'days'), moment()];
 
 var flotLineChart = new DeviceChart({ appendTo: chartWrap });
+
+var dateMapLogs = {};
 
 // for new daterange
 dateRangePicker.daterangepicker({
@@ -59,6 +62,10 @@ function triggerLoadChartData(){
 	// open loading spinner
 	chartWrap.parent().addClass("sk-loading");
 
+	// reset
+	dateMapLogs = {};
+	logTitle.text("");
+
 	Promise.all([
 		flotLineChart.loadData({
 			deviceName: deviceName,
@@ -70,7 +77,14 @@ function triggerLoadChartData(){
 				start: moment(rangeDate.startDate).format("YYYY-MM-DD"),
 				end: moment(rangeDate.endDate).format("YYYY-MM-DD")
 			}))
-			.then(function(res){ console.log(res); })
+			.then(function(res){
+				res.forEach(function(log){
+					dateMapLogs[log.date] = {
+						title: log.title,
+						content: log.content
+					};
+				});
+			})
 	])
 	.then(function(){
 		// close loading spinner
@@ -87,6 +101,15 @@ propertiesSelect.change(function(){
 });
 
 tuneChartHeight();
+
+flotLineChart.onHover(function(stamp, value, item){
+	var message = "",
+		datestr = moment(Math.ceil(stamp)).format("YYYY-MM-DD");
+	if ( dateMapLogs[datestr] ) {
+		message = dateMapLogs[datestr].title;
+	}
+	logTitle.text(message);
+});
 
 $(".line-chart a[csv-export]").click(function(){ 
 	var rangeDate = dateRangePicker.data('daterangepicker'),

@@ -298,5 +298,12 @@
         saveAs(blob, filename + ".csv");
     };
 
+    dc.prototype.onHover = function(fn){
+        var self = this;
+        self._el.bind("plothover", function (event, pos, item) {
+            fn(pos.x, pos.y, item);
+        });
+    };
+
     scope.DeviceChart = dc;
 })(window);
