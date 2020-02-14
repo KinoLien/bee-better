@@ -87,6 +87,19 @@ function triggerLoadChartData(){
 			})
 	])
 	.then(function(){
+
+		var theMarkings = Object.keys(dateMapLogs)
+			.map(function(datestr){
+				var mDate = moment(datestr);
+				return {
+					from: mDate.startOf('day').toDate().getTime(),
+					to: mDate.endOf('day').toDate().getTime(),
+					color: "#feffd1"
+				}
+			});
+
+		flotLineChart.setMarkings(theMarkings);
+
 		// close loading spinner
 		chartWrap.parent().removeClass("sk-loading");
 	});

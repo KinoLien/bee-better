@@ -298,6 +298,24 @@
         saveAs(blob, filename + ".csv");
     };
 
+    dc.prototype.setMarkings = function(markings){
+        var self = this;
+        if (!self._plot) return;
+        var convertMarkings = [];
+        markings.forEach(function(mk){
+            convertMarkings.push({
+                xaxis: {
+                    from: mk.from,
+                    to: mk.to
+                },
+                color: mk.color
+            });
+        });
+        self._plot.getOptions().grid.markings = convertMarkings;
+        self._plot.setupGrid();
+        self._plot.draw();
+    };
+
     dc.prototype.onHover = function(fn){
         var self = this;
         self._el.bind("plothover", function (event, pos, item) {
