@@ -98,15 +98,23 @@
 
         self._el.bind("plothover", function (event, pos, item) {
             if (!self._plot) return;
-            self._plot.getOptions().grid.markings = [{
+            self._plot.getOptions().grid.markings = (self._customMarkings || []).concat([{
                 xaxis: {
                     from: pos.x,
                     to: pos.x
                 },
                 color: "#ececec"
-            }];
+            }]);
             self._plot.setupGrid();
             self._plot.draw();
+
+            // for all points highlight
+            self._plot.unhighlight();
+            if (item) {
+                for (var i = 0; i < self._propCount; i++) {
+                    self._plot.highlight(i, item.dataIndex);
+                }
+            }
         });
 
     }
@@ -264,6 +272,7 @@
             if (propKeyMapData[propKey]) datasets.push(propKeyMapData[propKey]);
         });
 
+        self._propCount = datasets.length;
         self._plot = $.plot(self._el, datasets, self._plotOps);
     };
 
@@ -311,6 +320,7 @@
                 color: mk.color
             });
         });
+        self._customMarkings = convertMarkings;
         self._plot.getOptions().grid.markings = convertMarkings;
         self._plot.setupGrid();
         self._plot.draw();
