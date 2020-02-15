@@ -102,8 +102,8 @@ module.exports = function(app, passport) {
             let resLog = await interface.updateCellLog(req.params.cellId, req.params.logId, data);
             res.status(200).json(resLog);
         } else if ( action == "delete" ) {
-            await interface.deleteCellLog(req.params.cellId, req.params.logId);
-            res.status(200);
+            await interface.deleteCellLog(req.user.id, req.params.cellId, req.params.logId);
+            res.status(200).send("OK");
         }
     });
 

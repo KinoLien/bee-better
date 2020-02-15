@@ -208,3 +208,28 @@ exports.updateCellLog = function(cellId, logId, data){
 		logRef.update(data).then((resobj) => { resolve(resobj); });
 	});
 };
+
+exports.deleteCellLog = function(ownerId, cellId, logId){
+	var ownerRef = usersCollect.doc(ownerId);
+	var cellLogsRef = cellsCollect.doc(cellId).collection("logs");
+	var logRef = cellLogsRef.doc(logId);
+	return new Promise((resolve, reject) => {
+		logRef.delete().then(() => { 
+			ownerRef.get().then(doc => {
+				let originData = doc.data(), removeIdx = -1;
+				for(let idx = 0, len = originData.logs.length; idx < len ;idx++) {
+					if ( logId == originData.logs[idx].id ) {
+						removeIdx = idx; break;
+					}
+				}
+				if ( removeIdx != -1 ) {
+					let updatedLogs = originData.logs.slice(0);
+					updatedLogs.splice(removeIdx, 1);
+					ownerRef.update({ logs: updatedLogs }).then(() => { 
+						resolve();
+					});
+				} else reject();
+			});
+		});
+	});
+};

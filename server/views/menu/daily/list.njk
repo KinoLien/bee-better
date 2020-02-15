@@ -25,7 +25,7 @@
                 <td log-content>{{ data.content }}</td>
                 <td>
                     <button data-cell-id="{{ data.device }}" data-log-id="{{ data.id }}" data-log-title="{{ data.title }}" data-log-content="{{ data.content }}" class="btn btn-sm btn-info log-update" data-toggle="modal" data-target="#updateModal">Update</button>
-                    <button data-cell-id="{{ data.device }}" data-log-id="{{ data.id }}" class="btn btn-sm btn-danger">Remove</button>
+                    <button data-cell-id="{{ data.device }}" data-log-id="{{ data.id }}" class="btn btn-sm btn-danger log-remove" data-toggle="modal" data-target="#removeModal">Remove</button>
                 </td>
             </tr>
             {% endfor %}
@@ -68,6 +68,30 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-sm btn-primary save-changes">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="removeModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">Log remove</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="device">
+                    <input type="hidden" name="log">
+                    Are you sure to remove this?
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-sm btn-danger remove-log">Yes</button>
             </div>
         </div>
     </div>
