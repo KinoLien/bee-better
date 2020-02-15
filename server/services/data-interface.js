@@ -150,7 +150,14 @@ exports.addCellLog = function(ownerId, cellId, logObj){
 				logObj.created_at = (new Date()).getTime();
 				logObj.owner = ownerRef;
 				logObj.cell = cellRef;
-				cellRef.collection("logs").add(logObj).then(() => { resolve() });
+				cellRef.collection("logs")
+					.add(logObj)
+					.then(ref => {
+						ownerRef.get().then(doc => {
+							let originData = doc.data();
+							ownerRef.update({ logs: (originData.logs || []).concat([ref]) }).then(() => { resolve(); });
+						});
+					});
 			} else reject("cell is not exist");
 		});
 	});
@@ -174,4 +181,22 @@ exports.getCellLogs = function(cellId, datestart, dateend){
 				resolve(results);
 			});
 	});
-}
+};
+
+exports.getOwnCellLogs = function(ownerId){
+	var ownerRef = usersCollect.doc(ownerId);
+
+	return new Promise((resolve, reject) => {
+		ownerRef.get().then(doc => {
+			var theData = doc.data();
+			Promise.all(theData.logs.map(logRef => {
+				return logRef.get().then(log => { 
+					var resData = log.data();
+					resData.id = log.id;
+					resData.device = resData.cell.id;
+					return resData;
+				});
+			})).then(allResults => { resolve(allResults) });
+		});
+	});
+};

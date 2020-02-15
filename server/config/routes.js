@@ -111,9 +111,8 @@ module.exports = function(app, passport) {
     });
 
     app.get('/daily/list', loginRequired, async function(req, res) {
-        // let reslogs = await interface.getCellLogs("01-14");
-        // console.log(reslogs);
-        res.render('menu/daily/list');
+        let reslogs = await interface.getOwnCellLogs(req.user.id);
+        res.render('menu/daily/list', { datalist: reslogs });
     });
 
     app.get('/daily/create', loginRequired, function(req, res) {

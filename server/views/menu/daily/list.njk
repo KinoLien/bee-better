@@ -1,3 +1,80 @@
 {% extends "layout.njk" %}
 
 {% block headtitle %}Daily - List{% endblock %}
+
+{% block innercontent %}
+<h4 class="font-weight-bold py-3 mb-4">Your Logs</h4>
+<div class="table-responsive">
+    <table class="gridview table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th style="width: 60px;">device</th>
+                <th style="width: 90px;">date</th>
+                <th>title</th>
+                <th>content</th>
+                <th style="width: 200px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if datalist|length %}
+            {% for data in datalist %}
+            <tr>
+                <td>{{ data.device }}</td>
+                <td>{{ data.date }}</td>
+                <td log-title>{{ data.title }}</td>
+                <td log-content>{{ data.content }}</td>
+                <td>
+                    <button data-cell-id="{{ data.device }}" data-log-id="{{ data.id }}" data-log-title="{{ data.title }}" data-log-content="{{ data.content }}" class="btn btn-sm btn-info log-update" data-toggle="modal" data-target="#updateModal">Update</button>
+                    <button data-cell-id="{{ data.device }}" data-log-id="{{ data.id }}" class="btn btn-sm btn-danger">Remove</button>
+                </td>
+            </tr>
+            {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">Log change</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <form class="form-horizontal">
+                            <input type="hidden" name="action" value="update">
+                            <input type="hidden" name="device">
+                            <input type="hidden" name="log">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Title</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="title" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Content</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" name="content" rows="7" style="resize: vertical; min-height:150px;"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-sm btn-primary save-changes">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block bodyjs %}
+<script src="{{ '/assets/js/menu/daily/list.js' | appendStamp }}"></script>
+{% endblock %}
