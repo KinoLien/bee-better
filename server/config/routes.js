@@ -89,6 +89,24 @@ module.exports = function(app, passport) {
         res.status(200).json(reslogs);
     });
 
+    app.post('/api/dailylist/:cellId/log/:logId', loginRequired, async function(req, res) {
+        let action = req.body.action;
+
+        // check the owner
+
+        let data = {
+            title: req.body.title,
+            content: req.body.content
+        };
+        if ( action == "update" ) {
+            let resLog = await interface.updateCellLog(req.params.cellId, req.params.logId, data);
+            res.status(200).json(resLog);
+        } else if ( action == "delete" ) {
+            await interface.deleteCellLog(req.params.cellId, req.params.logId);
+            res.status(200);
+        }
+    });
+
     // =====================================
     // CONSOLE =============================
     // =====================================

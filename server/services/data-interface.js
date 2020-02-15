@@ -200,3 +200,11 @@ exports.getOwnCellLogs = function(ownerId){
 		});
 	});
 };
+
+exports.updateCellLog = function(cellId, logId, data){
+	var cellLogsRef = cellsCollect.doc(cellId).collection("logs");
+	var logRef = cellLogsRef.doc(logId);
+	return new Promise((resolve, reject) => {
+		logRef.update(data).then((resobj) => { resolve(resobj); });
+	});
+};
