@@ -91,20 +91,22 @@ module.exports = function(app, passport) {
 
     app.post('/api/dailylist/:cellId/log/:logId', loginRequired, async function(req, res) {
         let action = req.body.action;
-
         // check the owner
-
-        let data = {
-            title: req.body.title,
-            content: req.body.content
-        };
-        if ( action == "update" ) {
-            let resLog = await interface.updateCellLog(req.params.cellId, req.params.logId, data);
-            res.status(200).json(resLog);
-        } else if ( action == "delete" ) {
-            await interface.deleteCellLog(req.user.id, req.params.cellId, req.params.logId);
-            res.status(200).send("OK");
-        }
+        let isSuperuser = req.user.superuser === true;
+        let isValid = isSuperuser || (await interface.checkCellOwner(req.user.id, req.params.cellId, req.params.logId));
+        if ( isValid ) {
+            let data = {
+                title: req.body.title,
+                content: req.body.content
+            };
+            if ( action == "update" ) {
+                let resLog = await interface.updateCellLog(req.params.cellId, req.params.logId, data);
+                res.status(200).json(resLog);
+            } else if ( action == "delete" ) {
+                await interface.deleteCellLog(req.params.cellId, req.params.logId);
+                res.status(200).send("OK");
+            }
+        } else res.status(403).send("Forbidden");
     });
 
     // =====================================

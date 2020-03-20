@@ -163,6 +163,19 @@ exports.addCellLog = function(ownerId, cellId, logObj){
 	});
 };
 
+exports.checkCellOwner = function(ownerId, cellId, logId){
+	var ownerRef = usersCollect.doc(ownerId);
+	return ownerRef.get().then(doc => {
+		const theData = doc.data();
+		let founds = theData.logs.filter(
+			logRef => {
+				return logRef.path.split("/" + cellId + "/").length > 1 && logRef.id == logId;
+			}
+		);
+		return founds.length > 0;
+	});
+};
+
 exports.getCellLogs = function(cellId, datestart, dateend){
 	var cellLogsRef = cellsCollect.doc(cellId).collection("logs");
 
@@ -209,27 +222,32 @@ exports.updateCellLog = function(cellId, logId, data){
 	});
 };
 
-exports.deleteCellLog = function(ownerId, cellId, logId){
-	var ownerRef = usersCollect.doc(ownerId);
+exports.deleteCellLog = function(cellId, logId){
 	var cellLogsRef = cellsCollect.doc(cellId).collection("logs");
 	var logRef = cellLogsRef.doc(logId);
 	return new Promise((resolve, reject) => {
-		logRef.delete().then(() => { 
-			ownerRef.get().then(doc => {
-				let originData = doc.data(), removeIdx = -1;
-				for(let idx = 0, len = originData.logs.length; idx < len ;idx++) {
-					if ( logId == originData.logs[idx].id ) {
-						removeIdx = idx; break;
-					}
+		let ownerRef;
+		logRef.get().then(doc => {
+			let logData = doc.data();
+			ownerRef = logData.owner;
+		}).then(() => {
+			return logRef.delete();
+		}).then(() => {
+			return ownerRef.get();
+		}).then(doc => {
+			let originData = doc.data(), removeIdx = -1;
+			for(let idx = 0, len = originData.logs.length; idx < len ;idx++) {
+				if ( logId == originData.logs[idx].id ) {
+					removeIdx = idx; break;
 				}
-				if ( removeIdx != -1 ) {
-					let updatedLogs = originData.logs.slice(0);
-					updatedLogs.splice(removeIdx, 1);
-					ownerRef.update({ logs: updatedLogs }).then(() => { 
-						resolve();
-					});
-				} else reject();
-			});
+			}
+			if ( removeIdx != -1 ) {
+				let updatedLogs = originData.logs.slice(0);
+				updatedLogs.splice(removeIdx, 1);
+				ownerRef.update({ logs: updatedLogs }).then(() => { 
+					resolve();
+				});
+			} else reject();
 		});
 	});
 };
