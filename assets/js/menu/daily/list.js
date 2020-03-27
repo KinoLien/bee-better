@@ -45,7 +45,7 @@ $(document.body).on('click', '#updateModal button.save-changes', function(event)
         }, {});
 
     // ajax post
-    Promise.resolve($.post("/api/dailylist/" + reqData.device + "/log/" + reqData.log, reqData))
+    Promise.resolve($.post("/api/dailylist/log/" + reqData.log, reqData))
         .then(() => {
             if ( updateModal._curSource ) {
                 updateModal._curSource.data({
@@ -69,7 +69,7 @@ $(document.body).on('click', '#removeModal button.remove-log', function(event){
         }, {});
 
     // ajax post
-    Promise.resolve($.post("/api/dailylist/" + reqData.device + "/log/" + reqData.log, reqData))
+    Promise.resolve($.post("/api/dailylist/log/" + reqData.log, reqData))
         .then(() => {
             if ( removeModal._curSource ) {
                 removeModal._curSource.parents("tr").remove();

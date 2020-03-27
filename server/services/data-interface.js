@@ -49,6 +49,7 @@ var filterValidValues = function(obj){
 
 var usersCollect = db.collection('users');
 var cellsCollect = db.collection('cells');
+var logsCollect = db.collection('logs');
 
 var cellExistMap = {};
 
@@ -136,7 +137,7 @@ exports.getCellData = function(cellId, datestart, dateend){
 exports.addCellLog = function(ownerId, cellId, logObj){
 	var cellRef = cellsCollect.doc(cellId);
 	var ownerRef = usersCollect.doc(ownerId);
-	
+
 	// default
 	var next = Promise.resolve();
 	if ( typeof cellExistMap[cellId] == 'undefined' ) {
@@ -150,36 +151,40 @@ exports.addCellLog = function(ownerId, cellId, logObj){
 				logObj.created_at = (new Date()).getTime();
 				logObj.owner = ownerRef;
 				logObj.cell = cellRef;
-				cellRef.collection("logs")
-					.add(logObj)
+
+				logsCollect.add(logObj)
 					.then(ref => {
-						ownerRef.get().then(doc => {
-							let originData = doc.data();
-							ownerRef.update({ logs: (originData.logs || []).concat([ref]) }).then(() => { resolve(); });
-						});
+						let bindPromises = [
+							ownerRef.get().then(doc => {
+								let originData = doc.data();
+								return ownerRef.update({ logs: (originData.logs || []).concat([ref]) });
+							}),
+							cellRef.get().then(doc => {
+								let originData = doc.data();
+								return cellRef.update({ logs: (originData.logs || []).concat([ref]) });
+							})
+						];
+						Promise.all(bindPromises).then(() => { resolve(); });
 					});
 			} else reject("cell is not exist");
 		});
 	});
 };
 
-exports.checkCellOwner = function(ownerId, cellId, logId){
+exports.checkLogOwner = function(ownerId, logId){
 	var ownerRef = usersCollect.doc(ownerId);
-	return ownerRef.get().then(doc => {
-		const theData = doc.data();
-		let founds = theData.logs.filter(
-			logRef => {
-				return logRef.path.split("/" + cellId + "/").length > 1 && logRef.id == logId;
-			}
-		);
-		return founds.length > 0;
+	var logRef = logsCollect.doc(logId);
+	return logRef.get().then(doc => {
+		let data;
+		return doc.exists && (data = doc.data()) && data.owner.id == ownerRef.id;
 	});
 };
 
 exports.getCellLogs = function(cellId, datestart, dateend){
-	var cellLogsRef = cellsCollect.doc(cellId).collection("logs");
+	var cellRef = cellsCollect.doc(cellId);
 
-	var dataQuery = cellLogsRef
+	var dataQuery = logsCollect
+		.where('cell', '==', cellRef)
 		.where('date', '>=', datestart)
 		.where('date', '<=', dateend)
 		.orderBy('date');
@@ -198,55 +203,88 @@ exports.getCellLogs = function(cellId, datestart, dateend){
 
 exports.getOwnCellLogs = function(ownerId){
 	var ownerRef = usersCollect.doc(ownerId);
-
+	var dataQuery = logsCollect.where('owner', '==', ownerRef);
 	return new Promise((resolve, reject) => {
-		ownerRef.get().then(doc => {
-			var theData = doc.data();
-			Promise.all(theData.logs.map(logRef => {
-				return logRef.get().then(log => { 
-					var resData = log.data();
-					resData.id = log.id;
+		dataQuery.get()
+			.then(querySnapshot => {
+				var results = [];
+				querySnapshot.forEach(doc => {
+					var resData = doc.data();
+					resData.id = doc.id;
 					resData.device = resData.cell.id;
-					return resData;
+					results.push(resData);
 				});
-			})).then(allResults => { resolve(allResults) });
-		});
+				resolve(results);
+			});
 	});
 };
 
-exports.updateCellLog = function(cellId, logId, data){
-	var cellLogsRef = cellsCollect.doc(cellId).collection("logs");
-	var logRef = cellLogsRef.doc(logId);
+exports.getAllCellLogs = function(){
+	return new Promise((resolve, reject) => {
+		logsCollect.get()
+			.then(querySnapshot => {
+				var results = [];
+				querySnapshot.forEach(doc => {
+					var resData = doc.data();
+					resData.id = doc.id;
+					resData.device = resData.cell.id;
+					resData.ownerid = resData.owner.id;
+					results.push(resData);
+				});
+				resolve(results);
+			});
+	});
+};
+
+exports.updateCellLog = function(logId, data){
+	var logRef = logsCollect.doc(logId);
 	return new Promise((resolve, reject) => {
 		logRef.update(data).then((resobj) => { resolve(resobj); });
 	});
 };
 
-exports.deleteCellLog = function(cellId, logId){
-	var cellLogsRef = cellsCollect.doc(cellId).collection("logs");
-	var logRef = cellLogsRef.doc(logId);
+exports.deleteCellLog = function(logId){
+	var logRef = logsCollect.doc(logId);
 	return new Promise((resolve, reject) => {
 		let ownerRef;
+		let cellRef;
 		logRef.get().then(doc => {
 			let logData = doc.data();
 			ownerRef = logData.owner;
+			cellRef = logData.cell;
 		}).then(() => {
 			return logRef.delete();
 		}).then(() => {
-			return ownerRef.get();
-		}).then(doc => {
-			let originData = doc.data(), removeIdx = -1;
-			for(let idx = 0, len = originData.logs.length; idx < len ;idx++) {
-				if ( logId == originData.logs[idx].id ) {
-					removeIdx = idx; break;
+			return Promise.all([ownerRef.get(), cellRef.get()]);
+		}).then(docs => {
+			let ownerData = docs[0].data();
+			let cellData = docs[1].data();
+
+			let ownerRemoveIdx = -1, cellRemoveIdx = -1;
+			// find index in owner
+			for(let idx = 0, len = ownerData.logs.length; idx < len ;idx++) {
+				if ( logId == ownerData.logs[idx].id ) {
+					ownerRemoveIdx = idx; break;
 				}
 			}
-			if ( removeIdx != -1 ) {
-				let updatedLogs = originData.logs.slice(0);
-				updatedLogs.splice(removeIdx, 1);
-				ownerRef.update({ logs: updatedLogs }).then(() => { 
-					resolve();
-				});
+			// find index in cell
+			for(let idx = 0, len = cellData.logs.length; idx < len ;idx++) {
+				if ( logId == cellData.logs[idx].id ) {
+					cellRemoveIdx = idx; break;
+				}
+			}
+
+			if ( ownerRemoveIdx != -1 && cellRemoveIdx != -1 ) {
+				let updatedOwnerLogs = ownerData.logs.slice(0);
+				let updatedCellLogs = cellData.logs.slice(0);
+
+				updatedOwnerLogs.splice(ownerRemoveIdx, 1);
+				updatedCellLogs.splice(cellRemoveIdx, 1);
+
+				Promise.all([
+					ownerRef.update({ logs: updatedOwnerLogs }),
+					cellRef.update({ logs: updatedCellLogs })
+				]).then(() => { resolve() });
 			} else reject();
 		});
 	});

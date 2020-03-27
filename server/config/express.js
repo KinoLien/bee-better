@@ -45,6 +45,7 @@ module.exports = function (app, passport) {
 	  	res.locals.userid = req.user.id;
 	  	res.locals.username = req.user.name;
 	  	res.locals.currentpath = req.path;
+	  	res.locals.isSuperuser = req.user.superuser === true;
 	  }
 	  next();
 	}); 

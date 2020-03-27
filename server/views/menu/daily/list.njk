@@ -34,6 +34,43 @@
     </table>
 </div>
 
+{% if isSuperuser %}
+<br/>
+<h4 class="font-weight-bold py-3 mb-4">Other Logs</h4>
+<div class="table-responsive">
+    <table class="gridview table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th style="width: 60px;">device</th>
+                <th style="width: 90px;">date</th>
+                <th>owner</th>
+                <th>title</th>
+                <th>content</th>
+                <th style="width: 200px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if otherdatalist|length %}
+            {% for data in otherdatalist %}
+            <tr>
+                <td>{{ data.device }}</td>
+                <td>{{ data.date }}</td>
+                <td>{{ data.ownerid }}</td>
+                <td log-title>{{ data.title }}</td>
+                <td log-content>{{ data.content }}</td>
+                <td>
+                    <button data-cell-id="{{ data.device }}" data-log-id="{{ data.id }}" data-log-title="{{ data.title }}" data-log-content="{{ data.content }}" class="btn btn-sm btn-info log-update" data-toggle="modal" data-target="#updateModal">Update</button>
+                    <button data-cell-id="{{ data.device }}" data-log-id="{{ data.id }}" class="btn btn-sm btn-danger log-remove" data-toggle="modal" data-target="#removeModal">Remove</button>
+                </td>
+            </tr>
+            {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+
 <!-- Modal -->
 <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">

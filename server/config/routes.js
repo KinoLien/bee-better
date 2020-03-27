@@ -89,21 +89,20 @@ module.exports = function(app, passport) {
         res.status(200).json(reslogs);
     });
 
-    app.post('/api/dailylist/:cellId/log/:logId', loginRequired, async function(req, res) {
+    app.post('/api/dailylist/log/:logId', loginRequired, async function(req, res) {
         let action = req.body.action;
         // check the owner
-        let isSuperuser = req.user.superuser === true;
-        let isValid = isSuperuser || (await interface.checkCellOwner(req.user.id, req.params.cellId, req.params.logId));
+        let isValid = res.locals.isSuperuser || (await interface.checkLogOwner(req.user.id, req.params.logId));
         if ( isValid ) {
             let data = {
                 title: req.body.title,
                 content: req.body.content
             };
             if ( action == "update" ) {
-                let resLog = await interface.updateCellLog(req.params.cellId, req.params.logId, data);
+                let resLog = await interface.updateCellLog(req.params.logId, data);
                 res.status(200).json(resLog);
             } else if ( action == "delete" ) {
-                await interface.deleteCellLog(req.params.cellId, req.params.logId);
+                await interface.deleteCellLog(req.params.logId);
                 res.status(200).send("OK");
             }
         } else res.status(403).send("Forbidden");
@@ -131,8 +130,15 @@ module.exports = function(app, passport) {
     });
 
     app.get('/daily/list', loginRequired, async function(req, res) {
-        let reslogs = await interface.getOwnCellLogs(req.user.id);
-        res.render('menu/daily/list', { datalist: reslogs });
+        let resdata = {};
+        if ( res.locals.isSuperuser ) {
+            let allLogs = await interface.getAllCellLogs();
+            resdata.datalist = allLogs.filter(log => log.ownerid == req.user.id);
+            resdata.otherdatalist = allLogs.filter(log => log.ownerid != req.user.id);
+        } else {
+            resdata.datalist = await interface.getOwnCellLogs(req.user.id);
+        }
+        res.render('menu/daily/list', resdata);
     });
 
     app.get('/daily/create', loginRequired, function(req, res) {
