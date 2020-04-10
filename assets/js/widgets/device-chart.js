@@ -65,7 +65,9 @@
 
     var _defaultOptions = {
         appendTo: document.body,
-        maxPoints: 500
+        maxPoints: 500,
+        maxBound: 100,
+        minBound: 0
     };
 
     function dc(options){
@@ -86,7 +88,8 @@
                         var currentAllData = ins._plot.getData();
                         var outputs = [];
                         currentAllData.forEach(function(series){
-                            outputs.push(series.label + ": " + parseFloat(series.data[XdataIndex][1]).toFixed(2) );
+                            var val = series.data[XdataIndex][1];
+                            if ( val ) outputs.push(series.label + ": " + parseFloat(val).toFixed(2) );
                         });
                         return "<b>%x</b> <br/>" + outputs.join("<br/>");
                     };
@@ -241,21 +244,23 @@
         
         var propKeys = Object.keys(propKeyMapData);
 
+        function isValidValue(v) {
+            return !isNaN(v) && v < self._options.maxBound && v > self._options.minBound;
+        }
+
         self._pointStamps.forEach(function(pointStamp){
             var items = self._stampMapData[pointStamp];
             if ( items && items.length ) {
                 propKeys.forEach(function(propKey){
 
-                    var propAvg = items.map(function(item){ return item[propKey]; })
-                        .reduce(function(acc, cur){ 
-                            if ( isNaN(cur) ) return acc;
-                            else if ( isNaN(acc) ) return cur;
-                            else return acc + cur;
-                        })
-                        / items.length;
+                    var validValues = items
+                        .map(function(item){ return item[propKey]; })
+                        .filter(function(v){ return isValidValue(v); });
 
-                    propAvg = isNaN(propAvg) ? null : propAvg;
+                    var propAvg = validValues.reduce(function(acc, cur){ return acc + cur; }, 0) / validValues.length;
 
+                    propAvg = isValidValue(propAvg) ? propAvg : null;
+                    
                     propKeyMapData[propKey].data.push( [ pointStamp, propAvg ] );
                 });
             } else {
