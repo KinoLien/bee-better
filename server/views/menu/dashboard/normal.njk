@@ -1,7 +1,7 @@
 
 {% extends "layout.njk" %}
 
-{% block headtitle %}Dashboard{% endblock %}
+{% block headtitle %}Dashboard - Normal{% endblock %}
 
 {% block headjs %}
 {{ super() }}
@@ -78,5 +78,5 @@
 {% endblock %}
 
 {% block bodyjs %}
-<script src="{{ '/assets/js/menu/dashboard.js' | appendStamp }}"></script>
+<script src="{{ '/assets/js/menu/dashboard/normal.js' | appendStamp }}"></script>
 {% endblock %}

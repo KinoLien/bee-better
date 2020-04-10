@@ -126,7 +126,11 @@ module.exports = function(app, passport) {
     app.get('/', loginRequired, function(req, res) { res.redirect('/dashboard'); });
 
     app.get('/dashboard', loginRequired, function(req, res) {
-        res.render('menu/dashboard');
+        res.render('menu/dashboard/normal');
+    });
+
+    app.get('/dashboard/normal', loginRequired, function(req, res) {
+        res.render('menu/dashboard/normal');
     });
 
     app.get('/daily/list', loginRequired, async function(req, res) {

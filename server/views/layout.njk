@@ -49,8 +49,13 @@
                         Bee
                     </div>
                 </li>
-                <li {% if currentpath == "/dashboard" %}class="active"{% endif %}>
-                    <a href="/dashboard"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard</span></a>
+                <li {% if currentpath|isGroupWith("/dashboard") %}class="active"{% endif %}>
+                    <a href="#"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li {% if (currentpath == "/dashboard/normal") or (currentpath == "/dashboard") %}class="active"{% endif %}>
+                            <a href="/dashboard/normal">Normal</a>
+                        </li>
+                    </ul>
                 </li>
                 <li {% if currentpath|isGroupWith("/daily") %}class="active"{% endif %}>
                     <a href="#"><i class="fa fa-bar-chart-o"></i> <span class="nav-label">Daily Logs</span><span class="fa arrow"></span></a>
