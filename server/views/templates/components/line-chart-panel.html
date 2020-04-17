@@ -1,0 +1,25 @@
+<template id="line-chart-panel" use-attrs="title,export,log">
+    <div class="ibox float-e-margins line-chart">
+        <div class="ibox-title">
+            <h5 title></h5>
+            <div class="ibox-tools">
+                <a if="export" class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                    <i class="fa fa-download"></i>
+                </a>
+                <ul if="export" class="dropdown-menu dropdown-user">
+                    <li><a href="#" csv-export>CSV</a></li>
+                </ul>
+                <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+            </div>
+        </div>
+        <div class="ibox-content">
+            {% include "templates/spinner/cube-grid.html" %}
+            <div class="flot-chart" style="min-height: 300px;"></div>
+        </div>
+        <div class="ibox-footer" if="log">
+            <strong>LOG</strong>: <span id="log-title"></span>
+        </div>
+    </div>
+</template>

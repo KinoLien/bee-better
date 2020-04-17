@@ -20,7 +20,7 @@ $(document).ready(function () {
     $('#side-menu').metisMenu();
 
     // Collapse ibox function
-    $('.collapse-link').on('click', function () {
+    $(document.body).on('click', '.collapse-link', function(event){
         var ibox = $(this).closest('div.ibox');
         var button = $(this).find('i');
         var content = ibox.children('.ibox-content');
