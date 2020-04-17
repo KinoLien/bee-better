@@ -133,6 +133,10 @@ module.exports = function(app, passport) {
         res.render('menu/dashboard/normal');
     });
 
+    app.get('/dashboard/compares', loginRequired, function(req, res) {
+        res.render('menu/dashboard/compares');
+    });
+
     app.get('/daily/list', loginRequired, async function(req, res) {
         let resdata = {};
         if ( res.locals.isSuperuser ) {

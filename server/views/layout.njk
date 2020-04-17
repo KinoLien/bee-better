@@ -20,6 +20,7 @@
 {% endblock %}
 
 {% block content %}
+{% include "templates/components/line-chart-panel.html" %}
 <div id="wrapper">
     <nav class="navbar-default navbar-static-side" role="navigation">
         <div class="sidebar-collapse">
@@ -54,6 +55,9 @@
                     <ul class="nav nav-second-level collapse">
                         <li {% if (currentpath == "/dashboard/normal") or (currentpath == "/dashboard") %}class="active"{% endif %}>
                             <a href="/dashboard/normal">Normal</a>
+                        </li>
+                        <li {% if currentpath == "/dashboard/compares" %}class="active"{% endif %}>
+                            <a href="/dashboard/compares">Compares</a>
                         </li>
                     </ul>
                 </li>
