@@ -67,11 +67,13 @@ function triggerLoadChartData(){
 	logTitle.text("");
 
 	Promise.all([
-		flotLineChart.loadData({
+		loadDeviceData({
 			deviceName: deviceName,
-			props: propertiesSelect.val(),
 			dateFrom: rangeDate.startDate,
 			dateTo: rangeDate.endDate
+		}).then(function(res){
+			flotLineChart.setData({ data: res[0], dateFrom: rangeDate.startDate, dateTo: rangeDate.endDate });
+			flotLineChart.setPropsShow(propertiesSelect.val());
 		}),
 		Promise.resolve($.getJSON("/api/dailylist/" + deviceName, {
 				start: moment(rangeDate.startDate).format("YYYY-MM-DD"),

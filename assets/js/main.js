@@ -351,3 +351,32 @@ function encodeParamPairs(param){
         .map(function(key){ return key + "=" + encodeURIComponent(param[key]); })
         .join('&');
 }
+
+function loadDeviceData({ deviceName, dateFrom, dateTo, date }) {
+    date = date || new Date();
+    
+    if ( !deviceName || !deviceName.length ) return console.error("DeviceChart: deviceName is missing.");
+
+    let startDate = dateFrom ? moment(dateFrom) : moment(date).startOf('day');
+    let endDate = dateTo ? moment(dateTo) : moment(date).endOf('day');
+
+    let params = {
+        end: endDate.toISOString(),
+        start: startDate.toISOString()
+    };
+
+    let names = Array.isArray(deviceName) ? deviceName.slice(0) : [deviceName];
+
+    let promises = names.map(function(dname){
+        let url = "/api/cells/" + dname + "?" + encodeParamPairs(params);
+        return Promise.resolve($.getJSON(url))
+            .then(function(res){
+                res.forEach(function(item){
+                    item["Time_localstamp"] = moment(item["Time_convert"]).toDate().getTime();
+                });
+                return res;
+            });
+    });
+
+    return Promise.all(promises);
+}
