@@ -1,4 +1,4 @@
-<template id="line-chart-panel" use-attrs="title,export,log">
+<template id="line-chart-panel" use-attrs="title,export,log,loading">
     <div class="ibox float-e-margins line-chart">
         <div class="ibox-title">
             <h5 title></h5>
@@ -14,7 +14,7 @@
                 </a>
             </div>
         </div>
-        <div class="ibox-content">
+        <div class="ibox-content" cls-if="loading:sk-loading">
             {% include "templates/spinner/cube-grid.html" %}
             <div class="flot-chart" style="min-height: 300px;"></div>
         </div>

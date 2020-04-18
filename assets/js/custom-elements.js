@@ -42,6 +42,18 @@ customElements.define('line-chart-panel',
                     }
                 }
 
+                let clsIfProp = targetEl.attr("cls-if");
+                // cls-if="loading:sk-loading"
+                if ( clsIfProp ) {
+                    let mapkey, classname;
+                    [mapkey, classname] = clsIfProp.split(":");
+                    let wrapRelated = propValuesMap[mapkey];
+                    targetEl.removeAttr("cls-if");
+                    if ( typeof wrapRelated != "undefined" || wrapRelated == "true" ) {
+                        targetEl.addClass(classname);
+                    }
+                }
+
                 Object.keys(propValuesMap).forEach(function(prop){
                     let value = propValuesMap[prop];
                     let targetRelated = targetEl.attr(prop);
