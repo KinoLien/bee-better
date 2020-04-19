@@ -9,7 +9,7 @@ var maxDate = new Date();
 
 var initDateRange = [moment().subtract(3, 'days'), moment()];
 
-var flotLineChart = new DeviceChart({ appendTo: chartWrap });
+var flotLineChart = new DeviceChart({ appendTo: chartWrap, yMax: 100, yMin: 0 });
 
 var dateMapLogs = {};
 
@@ -67,11 +67,13 @@ function triggerLoadChartData(){
 	logTitle.text("");
 
 	Promise.all([
-		flotLineChart.loadData({
+		loadDeviceData({
 			deviceName: deviceName,
-			props: propertiesSelect.val(),
 			dateFrom: rangeDate.startDate,
 			dateTo: rangeDate.endDate
+		}).then(function(res){
+			flotLineChart.setData({ data: res[0], dateFrom: rangeDate.startDate, dateTo: rangeDate.endDate });
+			flotLineChart.setPropsShow(propertiesSelect.val());
 		}),
 		Promise.resolve($.getJSON("/api/dailylist/" + deviceName, {
 				start: moment(rangeDate.startDate).format("YYYY-MM-DD"),
@@ -135,3 +137,4 @@ $(".line-chart a[csv-export]").click(function(){
 	
 	flotLineChart.exportRaw(propertiesSelect.val(), filename);
 });
+

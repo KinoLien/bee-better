@@ -43,9 +43,6 @@
             mode: 'time',
             timezone: "browser"
         },
-        yaxis: {
-            max: 100
-        },
         legend: {
             show: true
         },
@@ -79,7 +76,7 @@
 
         $(self._options.appendTo).append(self._el);
 
-        self._plotOps = _assign(_plotOptions, {
+        var customPlotOpts = {
             tooltipOpts: {
                 content: (function(ins){
                     return function(data, x, y, dataObject) {
@@ -95,7 +92,15 @@
                     };
                 })(self)
             }
-        });
+        };
+
+        // yMax and yMin
+        if ( typeof options.yMax != "undefined" )
+            customPlotOpts.yaxis = _assign(customPlotOpts.yaxis || {}, { max: options.yMax });
+        if ( typeof options.yMin != "undefined" )
+            customPlotOpts.yaxis = _assign(customPlotOpts.yaxis || {}, { min: options.yMin });
+
+        self._plotOps = _assign(_plotOptions, customPlotOpts);
 
         self._stampMapData = null;
 
@@ -122,107 +127,80 @@
 
     }
 
-    // dateFrom, dateTo, date, deviceName, props
-    dc.prototype.loadData = function(opts){
-        var self = this;
+    dc.prototype.setData = function({ data, dateFrom, dateTo }){
+        let self = this;
 
-        opts = _assign({
-            date: new Date()
-        }, opts || {});
-
-        if ( !opts.deviceName ) return console.error("DeviceChart: deviceName is missing.");
+        // collect raw data
+        self._rawData = data;
 
         // reset
         self._pointStamps = [];
         self._stampMapData = null;
 
-        var startDate = opts.dateFrom ? moment(opts.dateFrom) : moment(opts.date).startOf('day');
-        var endDate = opts.dateTo ? moment(opts.dateTo) : moment(opts.date).endOf('day');
-
-        var maxPoints = self._options.maxPoints,
-            rangeMaxTime = endDate.toDate().getTime(),
-            rangeMinTime = startDate.toDate().getTime(),
+        let maxPoints = self._options.maxPoints,
+            rangeMaxTime = moment(dateTo).toDate().getTime(),
+            rangeMinTime = moment(dateFrom).toDate().getTime(),
             rangeDateDiff = rangeMaxTime - rangeMinTime;
 
-        var params = {
-            end: endDate.toISOString(),
-            start: startDate.toISOString()
-        };
+        // find unit step
+        var unitStep = Number.MAX_SAFE_INTEGER,
+            // maxStep = 1000 * 60 * 5, // 5 mins
+            minStamp, maxStamp;
+        if ( data.length > 1 ) {
+            for(var i = 0, len = data.length - 1; i < len ; i++) {
+                var item = data[i];
+                var nextItem = data[i+1];
 
-        var url = "/api/cells/" + opts.deviceName + "?" + encodeParamPairs(params);
+                var diff = nextItem["Time_localstamp"] - item["Time_localstamp"];
+                if (diff > 0)
+                    unitStep = Math.min( unitStep, diff );
+            }
+            minStamp = data[0]["Time_localstamp"];
+            maxStamp = data[data.length - 1]["Time_localstamp"];
+        } else {
+            minStamp = maxStamp = ( data[0] ? data[0]["Time_localstamp"] : 0 );
+        }
 
-        return Promise.resolve($.getJSON(url))
-            .then(function(res){
+        var slicePoints = Math.min( maxPoints, rangeDateDiff / unitStep );
+        if ( slicePoints == maxPoints ) {
+            unitStep = Math.floor( rangeDateDiff / slicePoints );
+        }
 
-                res.forEach(function(item){
-                    item["Time_localstamp"] = moment(item["Time_convert"]).toDate().getTime();
-                });
+        var pointStamps = [], stampTick = minStamp;
+        // fit stamps before minStamp
+        while( stampTick - rangeMinTime >= unitStep ) {
+            stampTick -= unitStep;
+            pointStamps.unshift(stampTick);
+        }
+        // fit stamps after minStamp
+        stampTick = minStamp;
+        do {
+            pointStamps.push(stampTick);
+            stampTick += unitStep;
+        } while( stampTick <= rangeMaxTime );
 
-                // find unit step
-                var unitStep = Number.MAX_SAFE_INTEGER,
-                    // maxStep = 1000 * 60 * 5, // 5 mins
-                    minStamp, maxStamp;
-                if ( res.length > 1 ) {
-                    for(var i = 0, len = res.length - 1; i < len ; i++) {
-                        var item = res[i];
-                        var nextItem = res[i+1];
+        // init stamp to items
+        var stampToItems = {};
+        pointStamps.forEach(function(stamp){
+            stampToItems[stamp] = [];
+        });
 
-                        var diff = nextItem["Time_localstamp"] - item["Time_localstamp"];
-                        if (diff > 0)
-                            unitStep = Math.min( unitStep, diff );
-                    }
-                    minStamp = res[0]["Time_localstamp"];
-                    maxStamp = res[res.length - 1]["Time_localstamp"];
-                } else {
-                    minStamp = maxStamp = ( res[0] ? res[0]["Time_localstamp"] : 0 );
-                }
+        // time alignment
+        var firstPointStamp = pointStamps[0];
+        data.forEach(function(item){
+            var stamp = item["Time_localstamp"];
 
-                var slicePoints = Math.min( maxPoints, rangeDateDiff / unitStep );
-                if ( slicePoints == maxPoints ) {
-                    unitStep = Math.floor( rangeDateDiff / slicePoints );
-                }
+            // find index
+            var pointStampIdx = Math.round( Math.abs( stamp - firstPointStamp ) / unitStep );
 
-                var pointStamps = [], stampTick = minStamp;
-                // fit stamps before minStamp
-                while( stampTick - rangeMinTime >= unitStep ) {
-                    stampTick -= unitStep;
-                    pointStamps.unshift(stampTick);
-                }
-                // fit stamps after minStamp
-                stampTick = minStamp;
-                do {
-                    pointStamps.push(stampTick);
-                    stampTick += unitStep;
-                } while( stampTick <= rangeMaxTime );
+            if ( pointStampIdx >= pointStamps.length ) pointStampIdx = pointStamps.length - 1;
 
-                // init stamp to items
-                var stampToItems = {};
-                pointStamps.forEach(function(stamp){
-                    stampToItems[stamp] = [];
-                });
+            var stkey = pointStamps[pointStampIdx];
+            if ( stampToItems[stkey] ) stampToItems[stkey].push(item);
+        });
 
-                // time alignment
-                var firstPointStamp = pointStamps[0];
-                res.forEach(function(item){
-                    var stamp = item["Time_localstamp"];
-
-                    // find index
-                    var pointStampIdx = Math.round( Math.abs( stamp - firstPointStamp ) / unitStep );
-
-                    if ( pointStampIdx >= pointStamps.length ) pointStampIdx = pointStamps.length - 1;
-
-                    var stkey = pointStamps[pointStampIdx];
-                    if ( stampToItems[stkey] ) stampToItems[stkey].push(item);
-                });
-
-                self._pointStamps = pointStamps;
-                self._stampMapData = stampToItems;
-                self._rawData = res;
-
-                self.setPropsShow(opts.props || []);
-
-                return res;
-            });
+        self._pointStamps = pointStamps;
+        self._stampMapData = stampToItems;
     };
 
     dc.prototype.setPropsShow = function(props){

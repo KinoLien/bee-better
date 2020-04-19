@@ -1,0 +1,64 @@
+
+{% extends "layout.njk" %}
+
+{% block headtitle %}Dashboard - Compares{% endblock %}
+
+{% block headjs %}
+{{ super() }}
+<script src="{{ '/assets/js/widgets/device-chart.js' | appendStamp }}"></script>
+{% endblock %}
+
+{% block innercontent %}
+<div class="ibox-content m-b-sm border-bottom">
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="control-label" for="daterangePicker">Datetime Range</label>
+                <input type="text" id="daterangePicker" value="" class="form-control">
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="form-group">
+                <label class="control-label" for="chosen-device">Device</label>
+                <select data-placeholder="Choose Devices" class="chosen-select" multiple id="chosen-device">
+                    {% for dev in devices %}
+                    <option value="{{ dev }}">{{ dev }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="control-label" for="chosen-properties">Properties</label>
+                <select data-placeholder="Choose Properties" class="chosen-select" multiple id="chosen-properties">
+                    <option selected value="Tem1">Tem1</option>
+                    <option value="Tem2">Tem2</option>
+                    <option value="Tem3">Tem3</option>
+                    <option value="Tem4">Tem4</option>
+                    <option selected value="Hum1">Hum1</option>
+                    <option value="Hum2">Hum2</option>
+                    <option value="Hum3">Hum3</option>
+                    <option value="Hum4">Hum4</option>
+                    <option selected value="Vol1">Vol1</option>
+                    <option value="Vol2">Vol2</option>
+                    <option value="Vol3">Vol3</option>
+                    <option value="Vol4">Vol4</option>
+                    <option selected value="Weight">Weight</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-1">
+            <div class="form-group">
+                <label class="control-label">&nbsp;</label>
+                <div>
+                    <button id="searchBtn" class="btn btn-info" disabled><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block bodyjs %}
+<script src="{{ '/assets/js/menu/dashboard/compares.js' | appendStamp }}"></script>
+{% endblock %}
