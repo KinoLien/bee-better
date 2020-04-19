@@ -43,9 +43,6 @@
             mode: 'time',
             timezone: "browser"
         },
-        yaxis: {
-            max: 100
-        },
         legend: {
             show: true
         },
@@ -79,7 +76,7 @@
 
         $(self._options.appendTo).append(self._el);
 
-        self._plotOps = _assign(_plotOptions, {
+        var customPlotOpts = {
             tooltipOpts: {
                 content: (function(ins){
                     return function(data, x, y, dataObject) {
@@ -95,7 +92,15 @@
                     };
                 })(self)
             }
-        });
+        };
+
+        // yMax and yMin
+        if ( typeof options.yMax != "undefined" )
+            customPlotOpts.yaxis = _assign(customPlotOpts.yaxis || {}, { max: options.yMax });
+        if ( typeof options.yMin != "undefined" )
+            customPlotOpts.yaxis = _assign(customPlotOpts.yaxis || {}, { min: options.yMin });
+
+        self._plotOps = _assign(_plotOptions, customPlotOpts);
 
         self._stampMapData = null;
 
