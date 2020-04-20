@@ -109,7 +109,8 @@ $("#searchBtn").click(function(){
         let minStep = allStamps.map(function(stamps){
             let m = Number.MAX_SAFE_INTEGER;
             for ( let i = 0, len = stamps.length - 1; i < len ; i++){
-                m = Math.min(m, stamps[i + 1] - stamps[i]);
+                let ns = stamps[i + 1], cs = stamps[i];
+                m = Math.min(m, ns == cs ? m : ns - cs);
             }
             return m;
         }).sort()[0];
