@@ -97,13 +97,15 @@ $("#searchBtn").click(function(){
             let curStampMap = {};
             let resStamps = res.map(function(d){ 
                 let theStamp = d["Time_localstamp"];
+                // avoid bug
+                if ( isNaN(theStamp) ) return null;
                 curStampMap[theStamp] = d;
                 minStamp = Math.min(minStamp, theStamp);
                 maxStamp = Math.max(maxStamp, theStamp);
                 return theStamp;
             });
             allStampMaps.push(curStampMap);
-            return resStamps;
+            return resStamps.filter(function(s){ return s != null; });
         });
 
         let minStep = allStamps.map(function(stamps){
