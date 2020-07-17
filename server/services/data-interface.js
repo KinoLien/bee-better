@@ -2,19 +2,25 @@ var admin = require("firebase-admin");
 var utils = require('./utils');
 var md5 = require('md5');
 
-var isProduction = process.env.NODE_ENV === 'production';
+// var isProduction = process.env.NODE_ENV === 'production';
 
-if ( isProduction ) {
-	admin.initializeApp({
-		credential: admin.credential.applicationDefault()
-	});
-} else {
-	var serviceAccount = require("../config/serviceAccountKey.json");
+// if ( isProduction ) {
+// 	admin.initializeApp({
+// 		credential: admin.credential.applicationDefault()
+// 	});
+// } else {
+// 	var serviceAccount = require("../config/serviceAccountKey.json");
 
-	admin.initializeApp({
-	  credential: admin.credential.cert(serviceAccount)
-	});
-}
+// 	admin.initializeApp({
+// 	  credential: admin.credential.cert(serviceAccount)
+// 	});
+// }
+
+var serviceAccount = require("../config/serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 var db = admin.firestore();
 
@@ -66,9 +72,15 @@ exports.validUser = function(email, password){
 						name: data.name,
 						cells: (data.cells || []).map(docRef => docRef.id)
 					};
-					resolve(resdata);
-				}
-				reject("Email or Password is not valid.");
+
+					if ( data.superuser ) {
+						cellsCollect.get()
+							.then(snapshot => {
+								resdata.cells = snapshot.docs.map(doc => doc.id);
+								resolve(resdata);
+							});
+					} else resolve(resdata);
+				} else reject("Email or Password is not valid.");
 			});
 	});
 };
@@ -88,7 +100,7 @@ exports.addData = function(cellId, dataObj){
 				// get current time
 				dataObj.created_at = (new Date()).getTime();
 				cellRef.collection("data").add(dataObj).then(() => { resolve() });
-			} else reject("cell is not exist");
+			} else reject(`cell: ${cellId} is not exist`);
 		});
 	});
 };
