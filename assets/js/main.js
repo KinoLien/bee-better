@@ -63,6 +63,9 @@ customElements.define('line-chart-panel',
                 });
             });
 
+            // remove title in default
+            this.removeAttribute("title");
+
             this.appendChild(nodeEl);
         }
     }
