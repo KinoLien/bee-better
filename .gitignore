@@ -1,2 +1,3 @@
 node_modules/*
 server/config/serviceAccountKey.json
+server/config/secrets.js

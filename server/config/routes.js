@@ -3,9 +3,14 @@
  */
 var express = require('express');
 var path = require('path');
+var secrets = require('./secrets');
 var utils = require('../services/utils');
 var interface = require('../services/data-interface');
 var nunjucks = require('nunjucks');
+var mqtt = require('mqtt');
+var mqttUrl = 'mqtt://localhost';
+
+var mqttClient = mqtt.connect(mqttUrl, secrets.mqttUserPass);
 
 // route middleware to make sure a user is logged in
 function loginRequired(req, res, next) {
@@ -64,6 +69,7 @@ module.exports = function(app, passport) {
             interface.addData(cellId, data)
                 .then( () => { 
                     console.log("[cellId: " + cellId + "] Insert OK.");
+                    mqttClient.publish(`${cellId}/data`, JSON.stringify(data));
                     res.status(200).send("OK");
                 } )
                 .catch(err => {
