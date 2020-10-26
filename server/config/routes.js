@@ -65,6 +65,11 @@ module.exports = function(app, passport) {
             }
         } );
 
+        // time case
+        if (typeof data["Time"] === "undefined") {
+            data["Time"] = utils.toFridayFormat(new Date());
+        }
+
         if (cellId) {
             interface.addData(cellId, data)
                 .then( () => { 
