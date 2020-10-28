@@ -66,7 +66,7 @@ module.exports = function(app, passport) {
         } );
 
         // time case
-        if (typeof data["Time"] === "undefined") {
+        if (!data["Time"]) {
             data["Time"] = utils.toFridayFormat(new Date());
         }
 
