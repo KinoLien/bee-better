@@ -65,6 +65,9 @@
         maxPoints: 500,
         maxBound: 100,
         minBound: 0
+        // rightProp
+        // yMax
+        // yMin
     };
 
     function dc(options){
@@ -94,11 +97,33 @@
             }
         };
 
+        if ( typeof options.rightProp === "string" ) {
+            customPlotOpts.yaxes = [ { position: "left" }, { position: "right" } ];
+        }
+
         // yMax and yMin
-        if ( typeof options.yMax != "undefined" )
-            customPlotOpts.yaxis = _assign(customPlotOpts.yaxis || {}, { max: options.yMax });
-        if ( typeof options.yMin != "undefined" )
-            customPlotOpts.yaxis = _assign(customPlotOpts.yaxis || {}, { min: options.yMin });
+        if ( typeof options.yMax != "undefined" ) {
+            if ( typeof options.rightProp === "string" ) {
+                var yMaxIsArray = Array.isArray(options.yMax);
+                var yMax0 = yMaxIsArray ? options.yMax[0] : options.yMax;
+                var yMax1 = yMaxIsArray ? options.yMax[1] : undefined;
+                customPlotOpts.yaxes[0] = _assign(customPlotOpts.yaxes[0], { max: yMax0 });
+                customPlotOpts.yaxes[1] = _assign(customPlotOpts.yaxes[1], { max: yMax1 });
+            } else {
+                customPlotOpts.yaxis = _assign(customPlotOpts.yaxis || {}, { max: options.yMax });
+            }
+        }
+        if ( typeof options.yMin != "undefined" ) {
+            if ( typeof options.rightProp === "string" ) {
+                var yMinIsArray = Array.isArray(options.yMin);
+                var yMin0 = yMinIsArray ? options.yMin[0] : options.yMin;
+                var yMin1 = yMinIsArray ? options.yMin[1] : undefined;
+                customPlotOpts.yaxes[0] = _assign(customPlotOpts.yaxes[0], { min: yMin0 });
+                customPlotOpts.yaxes[1] = _assign(customPlotOpts.yaxes[1], { min: yMin1 });
+            } else {
+                customPlotOpts.yaxis = _assign(customPlotOpts.yaxis || {}, { min: options.yMin });
+            }
+        }
 
         self._plotOps = _assign(_plotOptions, customPlotOpts);
 
@@ -207,6 +232,8 @@
         var self = this;
         if ( !self._stampMapData || self._pointStamps.length == 0 ) return;
 
+        var rightProp = self._options.rightProp;
+        var rightExist = typeof rightProp === "string";
         var datasets = [];
         var propKeyMapData = {};
 
@@ -218,13 +245,40 @@
                 label: propLabel,
                 data: []
             };
+            if (rightExist) {
+                propKeyMapData[propKey].yaxis = (propKey === rightProp) ? 2 : 1;
+            }
         });
         
         var propKeys = Object.keys(propKeyMapData);
 
-        function isValidValue(v) {
-            return !isNaN(v) && v < self._options.maxBound && v > self._options.minBound;
-        }
+        var isValidValue = (function(keys){
+            var maxB = self._options.maxBound;
+            var minB = self._options.minBound;
+
+            var maxBIsArray = Array.isArray(maxB);
+            var minBIsArray = Array.isArray(minB);
+
+            var maxB0 = maxBIsArray ? maxB[0] : maxB;
+            var maxB1 = maxBIsArray ? maxB[1] : undefined;
+
+            var minB0 = minBIsArray ? minB[0] : minB;
+            var minB1 = minBIsArray ? minB[1] : undefined;
+
+            var boundMap = {};
+            keys.forEach(function(k){
+                boundMap[k] = {
+                    maxBound: (k === rightProp) ? maxB1 : maxB0,
+                    minBound: (k === rightProp) ? minB1 : minB0
+                }
+            });
+            return function(prop, v){
+                var bound = boundMap[prop];
+                return !isNaN(v) && 
+                    (typeof bound.maxBound == "undefined" || v < bound.maxBound) &&
+                    (typeof bound.minBound == "undefined" || v > bound.minBound);
+            };
+        })(propKeys);
 
         self._pointStamps.forEach(function(pointStamp){
             var items = self._stampMapData[pointStamp];
@@ -233,11 +287,11 @@
 
                     var validValues = items
                         .map(function(item){ return item[propKey]; })
-                        .filter(function(v){ return isValidValue(v); });
+                        .filter(function(v){ return isValidValue(propKey, v); });
 
                     var propAvg = validValues.reduce(function(acc, cur){ return acc + cur; }, 0) / validValues.length;
 
-                    propAvg = isValidValue(propAvg) ? propAvg : null;
+                    propAvg = isValidValue(propKey, propAvg) ? propAvg : null;
                     
                     propKeyMapData[propKey].data.push( [ pointStamp, propAvg ] );
                 });
