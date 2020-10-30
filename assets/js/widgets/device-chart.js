@@ -62,9 +62,9 @@
 
     var _defaultOptions = {
         appendTo: document.body,
-        maxPoints: 500,
-        maxBound: 100,
-        minBound: 0
+        maxPoints: 500
+        // maxBound: 100,
+        // minBound: 0
         // rightProp
         // yMax
         // yMin
@@ -98,7 +98,18 @@
         };
 
         if ( typeof options.rightProp === "string" ) {
-            customPlotOpts.yaxes = [ { position: "left" }, { position: "right" } ];
+            customPlotOpts.yaxes = [
+                { position: "left" },
+                {
+                    position: "right",
+                    color: "black",
+                    axisLabel: options.rightProp,
+                    axisLabelUseCanvas: true,
+                    axisLabelFontSizePixels: 12,
+                    axisLabelFontFamily: 'Verdana, Arial',
+                    axisLabelPadding: 3
+                }
+            ];
         }
 
         // yMax and yMin

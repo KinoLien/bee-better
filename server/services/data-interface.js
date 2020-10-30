@@ -13,17 +13,18 @@ var db = admin.firestore();
 // should be set on console and save to db
 var valuesValids = {
 	"Tem1": [0, 100],
-	"Tem2": [0, 100],
-	"Tem3": [0, 100],
+	"Tem2": [0, 360],
+	"Tem3": [0, 200],
 	"Tem4": [0, 100],
 	"Hum1": [0, 100],
-	"Hum2": [0, 100],
+	"Hum2": [0, 200],
 	"Hum3": [0, 100],
 	"Hum4": [0, 100],
 	"Vol1": [0, 100],
 	"Vol2": [0, 100],
 	"Vol3": [0, 100],
 	"Vol4": [0, 100],
+	"Lat": [0, 65535],
 	"Weight": [0, 100]
 };
 

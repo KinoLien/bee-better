@@ -11,7 +11,7 @@ var initDateRange = [moment().subtract(3, 'days'), moment()];
 
 var flotLineChart = new DeviceChart({ 
 	appendTo: chartWrap, 
-	yMax: [100, 65535],
+	// yMax: [100, 65535],
 	yMin: [0, 0],
 	rightProp: "Lat"
 });
