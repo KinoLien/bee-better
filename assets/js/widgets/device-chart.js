@@ -68,6 +68,15 @@
         // rightProp
         // yMax
         // yMin
+        // labelsMap
+    };
+
+    var _getLabel = function(ins, v) {
+        var map = ins._options.labelsMap;
+        if (typeof map !== "undefined" && typeof map[v] === "string") {
+            return map[v];
+        }
+        return v;
     };
 
     function dc(options){
@@ -103,7 +112,7 @@
                 {
                     position: "right",
                     color: "black",
-                    axisLabel: options.rightProp,
+                    axisLabel: _getLabel(self, options.rightProp),
                     axisLabelUseCanvas: true,
                     axisLabelFontSizePixels: 12,
                     axisLabelFontFamily: 'Verdana, Arial',
@@ -251,7 +260,7 @@
         props.forEach(function(item){
             var isStr = typeof item == "string",
                 propKey = isStr ? item : item.value,
-                propLabel = isStr ? item : item.label;
+                propLabel = isStr ? _getLabel(self, item) : item.label;
             propKeyMapData[propKey] = {
                 label: propLabel,
                 data: []

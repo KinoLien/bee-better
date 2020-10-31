@@ -13,7 +13,13 @@ var flotLineChart = new DeviceChart({
 	appendTo: chartWrap, 
 	// yMax: [100, 65535],
 	yMin: [0, 0],
-	rightProp: "Lat"
+	rightProp: "Lat",
+	labelsMap: {
+		"Lat": "Lux",
+		"Tem2": "WD",
+		"Hum2": "WS",
+		"Tem3": "Soil"
+	}
 });
 
 var dateMapLogs = {};
