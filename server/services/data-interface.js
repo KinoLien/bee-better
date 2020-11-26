@@ -288,3 +288,18 @@ exports.deleteCellLog = function(logId){
 		});
 	});
 };
+
+exports.getAllUsers = function(){
+	return new Promise((resolve, reject) => {
+		usersCollect.get()
+			.then(querySnapshot => {
+				var results = [];
+				querySnapshot.forEach(doc => {
+					var resData = doc.data();
+					delete resData.pass;
+					results.push(resData);
+				});
+				resolve(results);
+			});
+	});
+};
