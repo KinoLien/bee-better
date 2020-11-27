@@ -2,7 +2,19 @@
 const schedule = require('node-schedule');
 const utils = require('../services/utils');
 const interface = require('../services/data-interface');
+const secrets = require('./secrets');
 const nunjucks = require('nunjucks');
+const nodemailer = require('nodemailer');
+
+const mailTransport = nodemailer.createTransport({
+	host: "smtp.mailgun.org",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+	auth: {
+		user: secrets.mailgun.user,
+		pass: secrets.mailgun.pass
+	}
+});
 
 const labelsMap = {
 	"Lat": "Lux",
@@ -22,7 +34,7 @@ module.exports = function() {
 		// console.log('The answer to life, the universe, and everything!');
 		
 		const users = await interface.getAllUsers();
-		const reportUsers = users.filter(u => u.dailyReport === true);
+		const reportUsers = users.filter(u => u.dailyReport === true && !!u.email);
 
 		const yesterday = new Date();
 		yesterday.setDate((new Date()).getDate() - 1);
@@ -89,9 +101,23 @@ module.exports = function() {
 				});
 			});
 
-			const resHtml = nunjucks.render('../views/templates/email/report.njk', { cells: outputCells });
+			const resHtml = nunjucks.render('../views/templates/email/report.njk', {
+				cells: outputCells,
+				name: user.name,
+				date: utils.to8digitDate(yesterday)
+			});
 
-			console.log(resHtml);
+			mailTransport.sendMail(
+				{
+					from: 'IotFarm <no-reply@msg.iotfarm.io>',
+					to: user.email,
+					subject: 'IotFarm 每日數值情況回報',
+					html: resHtml
+				},
+				function(err) {
+					if (err) console.log('Unable to send email: ' + err);
+				}
+			);
 		});
 	});
 };

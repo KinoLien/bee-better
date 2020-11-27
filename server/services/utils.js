@@ -117,6 +117,15 @@ exports.to24hFormat = function(dte){
 	].join(":");
 };
 
+exports.to8digitDate = function(dte){
+	var year = dte.getFullYear(),
+		month = dte.getMonth() + 1,
+		day = dte.getDate();
+	return [
+		year, lessTenAddZero(month), lessTenAddZero(day)
+	].join("/");
+}
+
 exports.assetsStampMap = function(){
 	var res = {};
 	var rootPath = process.cwd();
