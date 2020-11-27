@@ -1,0 +1,14 @@
+<p>Hi, {{ name }}</p>
+<br/>
+<p>以下是昨日 {{ date}} 的數值概況：</p>
+<br/>
+{% for cell in cells %}
+<h3>設備編號 {{ cell.name }}</h3>
+    {% for field in cell.fields %}
+    <h4>測項 {{ field.name }} 的值超出適宜範圍 有以下時段：</h4>
+        {% for range in field.ranges %}
+        <p>從 {{ range.start }} 到 {{ range.end }}</p>
+        {% endfor %}
+    {% endfor %}
+    <br/>
+{% endfor %}
