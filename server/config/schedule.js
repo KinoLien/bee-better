@@ -1,7 +1,8 @@
 
-var schedule = require('node-schedule');
-var utils = require('../services/utils');
-var interface = require('../services/data-interface');
+const schedule = require('node-schedule');
+const utils = require('../services/utils');
+const interface = require('../services/data-interface');
+const nunjucks = require('nunjucks');
 
 const labelsMap = {
 	"Lat": "Lux",
@@ -40,12 +41,15 @@ module.exports = function() {
 			const srs = reportSafeRanges;
 			const safeKeys = Object.keys(srs);
 
+			const outputCells = [];
+
 			// conditions for normal range
 			cellResults.forEach((results, cidx) => {
 				const totalCount = results.length;
 				const keyRecordStatus = {};
 				const keyCacheDate = {};
 				const keyRangeDate = {};
+				const outputFields = [];
 				safeKeys.forEach(k => { 
 					keyRecordStatus[k] = false;
 					keyCacheDate[k] = '';
@@ -67,9 +71,27 @@ module.exports = function() {
 					});
 				});
 
-				console.log(cellIds[cidx]);
-				console.log(keyRangeDate);
+				safeKeys.forEach(k => {
+					outputFields.push({
+						name: labelsMap[k] || k,
+						ranges: keyRangeDate[k].map(lr => {
+							return {
+								start: utils.to24hFormat(new Date(lr[0])),
+								end: utils.to24hFormat(new Date(lr[1]))
+							};
+						})
+					});
+				});
+
+				outputCells.push({
+					name: cellIds[cidx],
+					fields: outputFields
+				});
 			});
+
+			const resHtml = nunjucks.render('../views/templates/email/report.njk', { cells: outputCells });
+
+			console.log(resHtml);
 		});
 	});
 };

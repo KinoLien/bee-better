@@ -108,6 +108,15 @@ exports.fridayFormatToISOString = function(num){
 		].join("");
 };
 
+exports.to24hFormat = function(dte){
+	var hour = dte.getHours(),
+		min = dte.getMinutes(),
+		sec = dte.getSeconds();
+	return [
+		lessTenAddZero(hour), lessTenAddZero(min), lessTenAddZero(sec)
+	].join(":");
+};
+
 exports.assetsStampMap = function(){
 	var res = {};
 	var rootPath = process.cwd();
