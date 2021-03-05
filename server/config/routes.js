@@ -186,7 +186,6 @@ module.exports = function(app, passport) {
     app.get('/device/create', loginRequired, superuserRequired, function(req, res) {
         res.render('menu/device/create');
     });
-
     app.get('/device/uniquecheck/cellid/:value', loginRequired, superuserRequired, function(req, res, next){
         const value = req.params.value;
         interface.getCell(value)
@@ -195,6 +194,15 @@ module.exports = function(app, passport) {
                 else res.send("ok");
             })
             .catch(next);
+    });
+    app.post('/device/create', loginRequired, superuserRequired, async function(req, res, next){
+        const cellId = req.body.cellid;
+        const name = req.body.name;
+
+        await interface.createCell(req.user.id, cellId, { name: name });
+        console.log("[Device: " + cellId + "] Create OK.");
+
+        res.redirect('/device/create');
     });
 
     // process the login form

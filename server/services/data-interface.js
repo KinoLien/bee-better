@@ -109,6 +109,27 @@ exports.getCell = function(cellId){
 		});
 };
 
+exports.createCell = function(ownerId, cellId, cellObj) {
+	var ownerRef = usersCollect.doc(ownerId);
+	return this.getCell(cellId)
+		.then(res => {
+			if (res) reject("cell is already exist");
+		})
+		.then(() => {
+			cellObj.created_at = (new Date()).getTime();
+			cellObj.owner = ownerRef;
+			cellObj.logs = [];
+			return cellsCollect.doc(cellId).set(cellObj);
+		})
+		.then(() => {
+			var cellRef = cellsCollect.doc(cellId);
+			return ownerRef.get().then(doc => {
+				let originData = doc.data();
+				return ownerRef.update({ cells: (originData.cells || []).concat([cellRef]) });
+			})
+		});
+};
+
 exports.getCellData = function(cellId, datestart, dateend){
 	var cellDataRef = cellsCollect.doc(cellId).collection("data");
 	var endDate, startDate;
