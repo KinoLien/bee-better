@@ -8551,3 +8551,10 @@ body.md-skin {
     margin: 0;
   }
 }
+
+.h-divider{
+  margin: 8px auto;
+  height:1px;
+  width:92%;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
