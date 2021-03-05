@@ -1,6 +1,6 @@
 {
 	"name": "bee-better",
-	"version": "0.0.1",
+	"version": "0.6.0",
 	"description": "For the bee better",
 	"repository": "https://github.com/KinoLien/bee-better.git",
 	"main": "server/index.js",
