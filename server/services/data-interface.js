@@ -79,6 +79,17 @@ exports.validUser = function(email, password){
 	});
 };
 
+exports.getUsers = function() {
+	return usersCollect.get()
+		.then(snapshot => {
+			return snapshot.docs.map(doc => {
+				var data = doc.data();
+				data.id = doc.id;
+				return data;
+			});
+		});
+};
+
 exports.addData = function(cellId, dataObj){
 	var cellRef = cellsCollect.doc(cellId);
 	
@@ -109,7 +120,7 @@ exports.getCell = function(cellId){
 		});
 };
 
-exports.createCell = function(ownerId, cellId, cellObj) {
+exports.createCell = function(ownerId, cellId, grantsToList, cellObj) {
 	var ownerRef = usersCollect.doc(ownerId);
 	return this.getCell(cellId)
 		.then(res => {
@@ -123,10 +134,23 @@ exports.createCell = function(ownerId, cellId, cellObj) {
 		})
 		.then(() => {
 			var cellRef = cellsCollect.doc(cellId);
-			return ownerRef.get().then(doc => {
-				let originData = doc.data();
-				return ownerRef.update({ cells: (originData.cells || []).concat([cellRef]) });
-			})
+
+			var updatePromises = grantsToList.map(userId => {
+				var userRef = usersCollect.doc(userId);
+				return userRef.get().then(doc => {
+					let originUserData = doc.data();
+					return userRef.update({ cells: (originUserData.cells || []).concat([cellRef]) });
+				});
+			});
+			
+			updatePromises.push(
+				ownerRef.get().then(doc => {
+					let originData = doc.data();
+					return ownerRef.update({ cells: (originData.cells || []).concat([cellRef]) });
+				})
+			);
+
+			return Promise.all(updatePromises).then(() => cellRef);
 		});
 };
 

@@ -1,4 +1,6 @@
 
+$(".chosen-select").chosen({width: '100%'});
+
 // /device/uniquecheck/cellid/
 $("input[unique]").blur(function(){
 	var $self = $(this);
