@@ -99,6 +99,16 @@ exports.addData = function(cellId, dataObj){
 	});
 };
 
+exports.getCell = function(cellId){
+	var cellRef = cellsCollect.doc(cellId);
+
+	return cellRef.get()
+		.then(doc => {
+			if (doc.exists) return doc.data();
+			else return false;
+		});
+};
+
 exports.getCellData = function(cellId, datestart, dateend){
 	var cellDataRef = cellsCollect.doc(cellId).collection("data");
 	var endDate, startDate;

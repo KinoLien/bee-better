@@ -72,6 +72,17 @@
                         </li>
                     </ul>
                 </li>
+                {% if isSuperuser %}
+                <li class="h-divider"></li>
+                <li {% if currentpath|isGroupWith("/device") %}class="active"{% endif %}>
+                    <a href="#"><i class="fa fa-ticket"></i> <span class="nav-label">Devices</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li {% if currentpath == "/device/create" %}class="active"{% endif %}>
+                            <a href="/device/create">Create</a>
+                        </li>
+                    </ul>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </nav>

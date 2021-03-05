@@ -23,6 +23,12 @@ function loginRequired(req, res, next) {
     res.redirect('/login');
 }
 
+function superuserRequired(req, res, next) {
+    if (res.locals.isSuperuser) return next();
+
+    res.sendStatus(404);
+}
+
 module.exports = function(app, passport) {
 
     var nunEnv = nunjucks.configure(app.get('views'), {
@@ -175,6 +181,20 @@ module.exports = function(app, passport) {
             console.log("[Log: " + cellId + " " + data.date + "] Insert OK.");
         }
         res.redirect('/daily/list');
+    });
+
+    app.get('/device/create', loginRequired, superuserRequired, function(req, res) {
+        res.render('menu/device/create');
+    });
+
+    app.get('/device/uniquecheck/cellid/:value', loginRequired, superuserRequired, function(req, res, next){
+        const value = req.params.value;
+        interface.getCell(value)
+            .then(function(results){
+                if ( results ) res.send("fail");
+                else res.send("ok");
+            })
+            .catch(next);
     });
 
     // process the login form
