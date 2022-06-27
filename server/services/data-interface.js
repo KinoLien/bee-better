@@ -90,6 +90,25 @@ exports.getUsers = function() {
 		});
 };
 
+exports.hasUser = function(ownerId) {
+	var userRef = usersCollect.doc(ownerId);
+	return userRef.get()
+		.then(doc => doc.exists ? { id: doc.id } : null)
+};
+
+exports.getOwnCells = function(ownerId) {
+	var userRef = usersCollect.doc(ownerId);
+	return userRef.get()
+		.then(doc => {
+			var data = doc.data();
+			if ( data.superuser ) {
+				return cellsCollect.get()
+					.then(snapshot => snapshot.docs.map(doc => doc.id));
+			}
+			return (data.cells || []).map(docRef => docRef.id);
+		});
+};
+
 exports.addData = function(cellId, dataObj){
 	var cellRef = cellsCollect.doc(cellId);
 	
@@ -193,6 +212,30 @@ exports.getCellData = function(cellId, datestart, dateend){
 				resolve(results);
 			});
 	});
+};
+
+exports.getCellLatestData = function(cellId) {
+	var cellDataRef = cellsCollect.doc(cellId).collection("data");
+	var nowDate = new Date();
+	var dataQuery = cellDataRef
+		.where('Time', '<=', utils.toFridayFormat(nowDate))
+		.orderBy('Time', 'desc')
+		.limit(1);
+
+	return dataQuery.get()
+		.then(querySnapshot => {
+			var result = null;
+			querySnapshot.forEach(doc => {
+				var data = doc.data();
+				var converted = Object.assign(
+					{ "Time_convert": utils.fridayFormatToISOString(data["Time"]) }, 
+					data,
+					filterValidValues(data)
+				);
+				result = converted;
+			});
+			return result;
+		});
 };
 
 exports.addCellLog = function(ownerId, cellId, logObj){

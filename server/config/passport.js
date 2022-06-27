@@ -2,9 +2,13 @@
 
 // load all the things we need
 var LocalStrategy   = require('passport-local').Strategy;
+const passportJWT = require("passport-jwt"),
+      JWTStrategy = passportJWT.Strategy,
+      ExtractJWT = passportJWT.ExtractJwt;
 var interface = require('../services/data-interface');
 var uuid = require('node-uuid');
 var utils = require('../services/utils');
+const secrets = require('./secrets');
 
 function checkAndUpdateCookie(req, res){
     var updateCookieValue = utils.getCookie(req);
@@ -62,5 +66,19 @@ module.exports = function(passport) {
             );
         })
     );
+
+    passport.use(
+        'jwt-check',
+        new JWTStrategy({
+            jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+            secretOrKey: secrets.jwt_secret
+        }, (jwt_payload, done) => {
+            interface.hasUser(jwt_payload.id).then(user => {
+                if (user)
+                    return done(null, user)
+                else 
+                    return done("Token not matched", false)
+            })
+    }))
 
 }; 

@@ -3,7 +3,9 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session      = require('express-session');
 var flash    = require('connect-flash');
+const secrets = require('./secrets');
 var path = require('path');
+var cors = require('cors');
 
 module.exports = function (app, passport) {
 	var node_env = process.env.NODE_ENV;
@@ -20,8 +22,10 @@ module.exports = function (app, passport) {
 	app.set('view cache', false);
 	app.set('view engine', 'njk');
 
+	app.use(cors());
+
 	app.use(session({ 
-		secret: '3EdCvFr$5TgBnHy^7Ujm', 
+		secret: secrets.jwt_secret, 
 		resave: false,
 		cookie: { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true },
 		saveUninitialized: true
