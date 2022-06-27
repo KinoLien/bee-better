@@ -3,6 +3,7 @@
  */
 var express = require('express');
 var path = require('path');
+const jwt = require('jsonwebtoken');
 var secrets = require('./secrets');
 var utils = require('../services/utils');
 var interface = require('../services/data-interface');
@@ -125,6 +126,31 @@ module.exports = function(app, passport) {
         } else res.status(403).send("Forbidden");
     });
 
+    // =====================================
+    // Mobile API ==========================
+    // =====================================
+    app.post('/mobile/api/login', passport.authenticate('local-login', {
+      session: false
+    }), (req, res) => {
+      // Token
+      const token = jwt.sign({id: req.user.id}, secrets.jwt_secret)
+
+      res.json({token: token})
+    });
+
+    app.get('/mobile/api/cells', passport.authenticate('jwt-check', {
+        session: false
+    }), async function(req, res) {
+        if ( !req.user ) {
+            res.json(['nobody'])
+        }
+        res.json(await interface.getOwnCells(req.user.id));
+    });
+
+    app.get('/mobile/api/cells/:cellId/latest', async function(req, res) {
+        res.json(await interface.getCellLatestData(req.params.cellId))
+    });
+    
     // =====================================
     // CONSOLE =============================
     // =====================================
