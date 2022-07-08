@@ -181,7 +181,12 @@ exports.createCell = function(ownerId, cellId, grantsToList, cellObj) {
 				})
 			);
 
-			return Promise.all(updatePromises).then(() => cellRef);
+			return Promise.all(updatePromises).then(() => {
+				// reset 
+				grantsToList.forEach(userId => cellOwnersMap[userId] = undefined);
+				cellOwnersMap[ownerId] = undefined;
+				return cellRef;
+			});
 		});
 };
 

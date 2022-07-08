@@ -226,7 +226,10 @@ module.exports = function(app, passport) {
     app.post('/device/create', loginRequired, superuserRequired, async function(req, res, next){
         const cellId = req.body.cellid;
         const name = req.body.name;
-        const grantsTo = req.body.grants || [];
+        let grantsTo = req.body.grants || [];
+        if (typeof req.body.grants === "string") {
+            grantsTo = [req.body.grants];
+        }
         
         await interface.createCell(req.user.id, cellId, grantsTo, { name: name });
         console.log("[Device: " + cellId + "] Create OK.");
