@@ -23,7 +23,7 @@
                 <select data-placeholder="Choose a Device..." class="chosen-select" id="chosen-device">
                 	<option value></option>
                 	{% for dev in devices %}
-                    <option value="{{ dev }}">{{ dev }}</option>
+                    <option value="{{ dev.id }}">{{ dev.name }}</option>
                     {% endfor %}
                 </select>
             </div>

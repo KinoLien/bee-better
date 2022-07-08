@@ -45,7 +45,7 @@ module.exports = function (app, passport) {
 	  res.locals.isDev = !isProduction;
 	  res.locals.login = req.isAuthenticated();
 	  if ( res.locals.login ) {
-	  	res.locals.devices = req.user.cells || [];
+	  	// res.locals.devices = req.user.cells || [];
 	  	res.locals.userid = req.user.id;
 	  	res.locals.username = req.user.name;
 	  	res.locals.currentpath = req.path;

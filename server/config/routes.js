@@ -168,16 +168,16 @@ module.exports = function(app, passport) {
 
     app.get('/', loginRequired, function(req, res) { res.redirect('/dashboard'); });
 
-    app.get('/dashboard', loginRequired, function(req, res) {
-        res.render('menu/dashboard/normal');
+    app.get('/dashboard', loginRequired, async function(req, res) {
+        res.render('menu/dashboard/normal', { devices: await interface.getOwnCells(req.user.id) });
     });
 
-    app.get('/dashboard/normal', loginRequired, function(req, res) {
-        res.render('menu/dashboard/normal');
+    app.get('/dashboard/normal', loginRequired, async function(req, res) {
+        res.render('menu/dashboard/normal', { devices: await interface.getOwnCells(req.user.id) });
     });
 
-    app.get('/dashboard/compares', loginRequired, function(req, res) {
-        res.render('menu/dashboard/compares');
+    app.get('/dashboard/compares', loginRequired, async function(req, res) {
+        res.render('menu/dashboard/compares', { devices: await interface.getOwnCells(req.user.id) });
     });
 
     app.get('/daily/list', loginRequired, async function(req, res) {
@@ -192,8 +192,8 @@ module.exports = function(app, passport) {
         res.render('menu/daily/list', resdata);
     });
 
-    app.get('/daily/create', loginRequired, function(req, res) {
-        res.render('menu/daily/create');
+    app.get('/daily/create', loginRequired, async function(req, res) {
+        res.render('menu/daily/create', { devices: await interface.getOwnCells(req.user.id) });
     });
     app.post('/daily/create', loginRequired, async function(req, res) {
         let cellId = req.body.device;
@@ -226,7 +226,10 @@ module.exports = function(app, passport) {
     app.post('/device/create', loginRequired, superuserRequired, async function(req, res, next){
         const cellId = req.body.cellid;
         const name = req.body.name;
-        const grantsTo = req.body.grants;
+        let grantsTo = req.body.grants || [];
+        if (typeof req.body.grants === "string") {
+            grantsTo = [req.body.grants];
+        }
         
         await interface.createCell(req.user.id, cellId, grantsTo, { name: name });
         console.log("[Device: " + cellId + "] Create OK.");
