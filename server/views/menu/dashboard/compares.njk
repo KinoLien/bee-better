@@ -22,7 +22,7 @@
                 <label class="control-label" for="chosen-device">Device</label>
                 <select data-placeholder="Choose Devices" class="chosen-select" multiple id="chosen-device">
                     {% for dev in devices %}
-                    <option value="{{ dev }}">{{ dev }}</option>
+                    <option value="{{ dev.id }}">{{ dev.name }}</option>
                     {% endfor %}
                 </select>
             </div>

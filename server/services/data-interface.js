@@ -52,6 +52,7 @@ var cellsCollect = db.collection('cells');
 var logsCollect = db.collection('logs');
 
 var cellExistMap = {};
+var cellOwnersMap = {};
 
 exports.validUser = function(email, password){
 	var userRef = usersCollect.doc(email);
@@ -63,17 +64,9 @@ exports.validUser = function(email, password){
 					var resdata = {
 						id: doc.id,
 						superuser: data.superuser,
-						name: data.name,
-						cells: (data.cells || []).map(docRef => docRef.id)
+						name: data.name
 					};
-
-					if ( data.superuser ) {
-						cellsCollect.get()
-							.then(snapshot => {
-								resdata.cells = snapshot.docs.map(doc => doc.id);
-								resolve(resdata);
-							});
-					} else resolve(resdata);
+					resolve(resdata);
 				} else reject("Email or Password is not valid.");
 			});
 	});
@@ -98,15 +91,34 @@ exports.hasUser = function(ownerId) {
 
 exports.getOwnCells = function(ownerId) {
 	var userRef = usersCollect.doc(ownerId);
-	return userRef.get()
-		.then(doc => {
-			var data = doc.data();
-			if ( data.superuser ) {
-				return cellsCollect.get()
-					.then(snapshot => snapshot.docs.map(doc => doc.id));
-			}
-			return (data.cells || []).map(docRef => docRef.id);
-		});
+
+	var next = Promise.resolve();
+	if ( typeof cellOwnersMap[ownerId] == 'undefined' ) {
+		next = userRef.get()
+			.then(doc => {
+				var data = doc.data();
+				if ( data.superuser ) {
+					return cellsCollect.get()
+						.then(snapshot => 
+							snapshot.docs.map(doc => {
+								return { id: doc.id, name: doc.data().name }
+							})
+						);
+				}
+				return Promise.all((data.cells || []).map(docRef => docRef.get()))
+					.then(dataResults => 
+						dataResults.map(res => {
+							return {
+								id: res.id,
+								name: res.data().name
+							}
+						})
+					);
+			})
+			.then(dataset => cellOwnersMap[ownerId] = dataset);
+	}
+
+	return next.then(() => cellOwnersMap[ownerId]);
 };
 
 exports.addData = function(cellId, dataObj){
