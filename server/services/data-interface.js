@@ -185,6 +185,7 @@ exports.createCell = function(ownerId, cellId, grantsToList, cellObj) {
 				// reset 
 				grantsToList.forEach(userId => cellOwnersMap[userId] = undefined);
 				cellOwnersMap[ownerId] = undefined;
+				cellExistMap[cellId] = undefined;
 				return cellRef;
 			});
 		});
