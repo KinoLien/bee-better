@@ -1,17 +1,17 @@
 {% extends "layout.njk" %}
 
-{% block headtitle %}Daily - List{% endblock %}
+{% block headtitle %}{{ lang | trans("Daily") }} - {{ lang | trans("List") }}{% endblock %}
 
 {% block innercontent %}
-<h4 class="font-weight-bold py-3 mb-4">Your Logs</h4>
+<h4 class="font-weight-bold py-3 mb-4">{{ lang | trans("Your Logs") }}</h4>
 <div class="table-responsive">
     <table class="gridview table table-striped table-bordered">
         <thead>
             <tr>
-                <th style="width: 60px;">device</th>
-                <th style="width: 90px;">date</th>
-                <th>title</th>
-                <th>content</th>
+                <th style="width: 60px;">{{ lang | trans("device") }}</th>
+                <th style="width: 90px;">{{ lang | trans("date") }}</th>
+                <th>{{ lang | trans("title") }}</th>
+                <th>{{ lang | trans("content") }}</th>
                 <th style="width: 200px;"></th>
             </tr>
         </thead>
@@ -24,8 +24,8 @@
                 <td log-title>{{ data.title }}</td>
                 <td log-content>{{ data.content }}</td>
                 <td>
-                    <button data-cell-id="{{ data.device }}" data-log-id="{{ data.id }}" data-log-title="{{ data.title }}" data-log-content="{{ data.content }}" class="btn btn-sm btn-info log-update" data-toggle="modal" data-target="#updateModal">Update</button>
-                    <button data-cell-id="{{ data.device }}" data-log-id="{{ data.id }}" class="btn btn-sm btn-danger log-remove" data-toggle="modal" data-target="#removeModal">Remove</button>
+                    <button data-cell-id="{{ data.device }}" data-log-id="{{ data.id }}" data-log-title="{{ data.title }}" data-log-content="{{ data.content }}" class="btn btn-sm btn-info log-update" data-toggle="modal" data-target="#updateModal">{{ lang | trans("Update") }}</button>
+                    <button data-cell-id="{{ data.device }}" data-log-id="{{ data.id }}" class="btn btn-sm btn-danger log-remove" data-toggle="modal" data-target="#removeModal">{{ lang | trans("Remove") }}</button>
                 </td>
             </tr>
             {% endfor %}

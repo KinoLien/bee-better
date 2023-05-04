@@ -1,7 +1,7 @@
 
 {% extends "layout.njk" %}
 
-{% block headtitle %}Daily - Create{% endblock %}
+{% block headtitle %}{{ lang | trans("Daily") }} - {{ lang | trans("Create") }}{% endblock %}
 
 {% block innercontent %}
 <form method="POST" action="{{ currentpath }}">
@@ -9,15 +9,15 @@
         <div class="col-lg-12">
             <div class="ibox-content m-b-sm border-bottom form-horizontal">
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Date</label>
+                    <label class="col-sm-2 control-label">{{ lang | trans("Date") }}</label>
                     <div class="col-sm-4">
                         <input type="text" id="daterangePicker" name="date" class="form-control" required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Device</label>
+                    <label class="col-sm-2 control-label">{{ lang | trans("Device") }}</label>
                     <div class="col-sm-4">
-                        <select data-placeholder="Choose a Device..." class="chosen-select" name="device" id="chosen-device" required>
+                        <select data-placeholder="{{ lang | trans("Choose a Device") }}..." class="chosen-select" name="device" id="chosen-device" required>
                             <option value></option>
                             {% for dev in devices %}
                             <option value="{{ dev.id }}">{{ dev.name }}</option>
@@ -26,13 +26,13 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Title / Summary</label>
+                    <label class="col-sm-2 control-label">{{ lang | trans("Title") }} / {{ lang | trans("Summary") }}</label>
                     <div class="col-sm-10">
                         <input type="text" name="title" class="form-control" required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Content / Description</label>
+                    <label class="col-sm-2 control-label">{{ lang | trans("Content") }} / {{ lang | trans("Description") }}</label>
                     <div class="col-sm-10">
                         <textarea class="form-control" name="content" rows="7" style="resize: vertical; min-height:150px;"></textarea>
                     </div>
@@ -43,7 +43,7 @@
 
     <div class="row m-b-md">
         <div class="col-lg-12">
-            <button type="submit" class="btn btn-primary pull-right">Create Log</button>
+            <button type="submit" class="btn btn-primary pull-right">{{ lang | trans("Create Log") }}</button>
         </div>
     </div>
 </form>

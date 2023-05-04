@@ -7,9 +7,7 @@ var maxDate = new Date();
 dateRangePicker.daterangepicker({
 	singleDatePicker: true,
 	maxDate: maxDate,
-	locale: {
-		format: 'YYYY-MM-DD'
-	}
+	locale: { ...datePickerLocale, format: 'YYYY-MM-DD' }
 });
 
 $(".chosen-select").chosen({width: '100%'})

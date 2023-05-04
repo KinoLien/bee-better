@@ -7,8 +7,6 @@ var dateRangePicker = $("#daterangePicker"),
 
 var maxDate = new Date();
 
-var initDateRange = [moment().subtract(3, 'days'), moment()];
-
 // var flotLineChart = new DeviceChart({ appendTo: chartWrap });
 var flotCharts = [];
 
@@ -23,14 +21,8 @@ dateRangePicker.daterangepicker({
     timePicker: true,
     timePicker24Hour: true,
     timePickerSeconds: true,
-    locale: {
-        format: 'YYYY-MM-DD HH:mm:ss'
-    },
-    ranges: {
-        'Nearly 3 Days': initDateRange,
-        'Nearly 7 Days': [moment().subtract(7, 'days'), moment()],
-        'Nearly 30 Days': [moment().subtract(30, 'days'), moment()]
-    },
+    locale: datePickerLocale,
+    ranges: constDateRanges,
     alwaysShowCalendars: true
 });
 

@@ -13,6 +13,20 @@ var mqttUrl = 'mqtt://localhost';
 
 var mqttClient = mqtt.connect(mqttUrl, secrets.mqttUserPass);
 
+const fs = require('fs');
+const localeDir = path.join(process.cwd(), "server", "locale" );
+const loadedLocaleSet = {};
+
+(() => {
+    fs.readdir(localeDir, function(err, files){
+        const jsonFiles = files.filter(el => path.extname(el) === '.json');
+        jsonFiles.forEach(file => {
+            const langCode = file.split(".json")[0];
+            loadedLocaleSet[langCode] = require( path.join(localeDir, file) );
+        });
+    });
+})();
+
 // route middleware to make sure a user is logged in
 function loginRequired(req, res, next) {
     // if user is authenticated in the session, carry on
@@ -49,6 +63,13 @@ module.exports = function(app, passport) {
 
     nunEnv.addFilter("isGroupWith", function(cur, target){
         return cur.substring(0, target.length) == target;
+    });
+
+    nunEnv.addFilter("trans", function(lang, word){
+        if ( loadedLocaleSet[lang] ) {
+            word = loadedLocaleSet[lang][word] || word;
+        }
+        return word;
     });
 
     // =====================================

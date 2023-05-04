@@ -44,6 +44,7 @@ module.exports = function (app, passport) {
 	app.use(function(req, res, next){
 	  res.locals.isDev = !isProduction;
 	  res.locals.login = req.isAuthenticated();
+	  res.locals.lang = req.acceptsLanguages('zh', 'en') || 'en';
 	  if ( res.locals.login ) {
 	  	// res.locals.devices = req.user.cells || [];
 	  	res.locals.userid = req.user.id;
