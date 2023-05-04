@@ -1,4 +1,41 @@
 {
 	"Device": "設備",
-	"Login": "登入"
+	"Login": "登入",
+	"Email": "電子郵件",
+	"Password": "密碼",
+	"Logout": "登出",
+	"Create": "創建",
+	"Devices": "設備列表",
+	"List": "列表",
+	"Daily Logs": "日誌",
+	"Compares": "比較",
+	"Normal": "一般",
+	"Dashboard": "儀表板",
+	"LOG": "日誌紀錄",
+	"Datetime Range": "日期時間範圍",
+	"Choose a Device": "選擇一個設備",
+	"Choose Devices": "選擇設備",
+	"Properties": "檢測項目",
+	"Choose Properties": "選擇檢測項目",
+
+	"Your Logs": "你的日誌紀錄",
+
+	"device": "設備",
+	"date": "日期",
+	"Date": "日期",
+	"title": "標題",
+	"Title": "標題",
+
+	"content": "內容",
+	"Content": "內容",
+
+	"Summary": "主旨",
+	"Description": "敘述",
+
+	"Update": "更新",
+	"Remove": "刪除",
+
+	"Create Log": "創建日誌",
+
+	"Line Chart": "折線圖"
 }

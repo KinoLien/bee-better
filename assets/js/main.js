@@ -382,3 +382,81 @@ function loadDeviceData({ deviceName, dateFrom, dateTo, date }) {
 
     return Promise.all(promises);
 }
+
+const userLang = navigator.language || navigator.userLanguage; 
+const langCode = userLang.substr(0, 2);
+const i18nMapping = {
+    zh: {
+        "Cancel": "取消",
+        "Apply": "確認",
+        "Custom Range": "自訂日期範圍",
+        "Nearly 3 Days": "最近 3 天",
+        "Nearly 7 Days": "最近 7 天",
+        "Nearly 30 Days": "最近 30 天",
+        "Su": "日",
+        "Mo": "一",
+        "Tu": "二",
+        "We": "三",
+        "Th": "四",
+        "Fr": "五",
+        "Sa": "六",
+        "Jan": "1月",
+        "Feb": "2月",
+        "Mar": "3月",
+        "Apr": "4月",
+        "May": "5月",
+        "Jun": "6月",
+        "Jul": "7月",
+        "Aug": "8月",
+        "Sep": "9月",
+        "Oct": "10月",
+        "Nov": "11月",
+        "Dec": "12月"
+    }
+}
+
+const _t = word => {
+    if ( i18nMapping[langCode] ) {
+        word = i18nMapping[langCode][word] || word;
+    }
+    return word;
+};
+
+
+const initDateRange = [moment().subtract(3, 'days'), moment()];
+const constDateRanges = {};
+
+constDateRanges[ _t('Nearly 3 Days') ] = initDateRange;
+constDateRanges[ _t('Nearly 7 Days') ] = [moment().subtract(7, 'days'), moment()];
+constDateRanges[ _t('Nearly 30 Days') ] = [moment().subtract(30, 'days'), moment()];
+
+const datePickerLocale = {
+    format: 'YYYY-MM-DD HH:mm:ss',
+    cancelLabel: _t('Cancel'),
+    applyLabel: _t('Apply'),
+    customRangeLabel: _t('Custom Range'),
+    daysOfWeek: [
+        _t("Su"),
+        _t("Mo"),
+        _t("Tu"),
+        _t("We"),
+        _t("Th"),
+        _t("Fr"),
+        _t("Sa")
+    ],
+    monthNames: [
+        _t("Jan"),
+        _t("Feb"),
+        _t("Mar"),
+        _t("Apr"),
+        _t("May"),
+        _t("Jun"),
+        _t("Jul"),
+        _t("Aug"),
+        _t("Sep"),
+        _t("Oct"),
+        _t("Nov"),
+        _t("Dec")
+    ]
+};
+

@@ -1,7 +1,7 @@
 
 {% extends "layout.njk" %}
 
-{% block headtitle %}Dashboard - Normal{% endblock %}
+{% block headtitle %}{{ lang | trans("Dashboard") }} - {{ lang | trans("Normal") }}{% endblock %}
 
 {% block headjs %}
 {{ super() }}
@@ -13,14 +13,14 @@
     <div class="row">
         <div class="col-sm-4">
             <div class="form-group">
-                <label class="control-label" for="daterangePicker">Datetime Range</label>
+                <label class="control-label" for="daterangePicker">{{ lang | trans("Datetime Range") }}</label>
                 <input type="text" id="daterangePicker" value="" class="form-control">
             </div>
         </div>
         <div class="col-sm-3">
             <div class="form-group">
-                <label class="control-label" for="chosen-device">Device</label>
-                <select data-placeholder="Choose a Device..." class="chosen-select" id="chosen-device">
+                <label class="control-label" for="chosen-device">{{ lang | trans("Device") }}</label>
+                <select data-placeholder="{{ lang | trans("Choose a Device") }}..." class="chosen-select" id="chosen-device">
                 	<option value></option>
                 	{% for dev in devices %}
                     <option value="{{ dev.id }}">{{ dev.name }}</option>
@@ -30,8 +30,8 @@
         </div>
         <div class="col-sm-5">
         	<div class="form-group">
-                <label class="control-label" for="chosen-properties">Properties</label>
-                <select data-placeholder="Choose Properties" class="chosen-select" multiple id="chosen-properties">
+                <label class="control-label" for="chosen-properties">{{ lang | trans("Properties") }}</label>
+                <select data-placeholder="{{ lang | trans("Choose Properties") }}" class="chosen-select" multiple id="chosen-properties">
                 	<option selected value="Tem1">Tem1</option>
                 	<option value="Tem2">Tem2</option>
                 	<option value="Tem3">Tem3</option>
@@ -52,7 +52,7 @@
 </div>
 <div class="row">
     <div class="col-lg-12">
-        <line-chart-panel title="Line Chart" export log></line-chart-panel>
+        <line-chart-panel title="{{ lang | trans("Line Chart") }}" export log></line-chart-panel>
     </div>
 </div>
 {% endblock %}
