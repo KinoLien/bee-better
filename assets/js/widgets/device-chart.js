@@ -41,10 +41,14 @@
     var _plotOptions = {
         xaxis: {
             mode: 'time',
-            timezone: "browser"
+            timezone: "browser",
+            timeformat: "%m/%d %H:%M"
         },
         legend: {
-            show: true
+            show: true,
+            labelFormatter: function(a, b){
+                return _t(a);
+            }
         },
         colors: ["#c62828", "#283593", "#00695C", "#F9A825", "#37474F", "#6A1B9A", "#0277BD", "#558B2F", "#EF6C00", "#4E342E"],
         grid: {
@@ -215,7 +219,7 @@
                 propKey = isStr ? item : item.value,
                 propLabel = isStr ? item : item.label;
             propKeyMapData[propKey] = {
-                label: propLabel,
+                label: _t(propLabel),
                 data: []
             };
         });

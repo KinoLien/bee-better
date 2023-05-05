@@ -15,7 +15,7 @@
 	"Datetime Range": "日期時間範圍",
 	"Choose a Device": "選擇一個設備",
 	"Choose Devices": "選擇設備",
-	"Properties": "檢測項目",
+	"Properties": "圖表數值",
 	"Choose Properties": "選擇檢測項目",
 
 	"Your Logs": "你的日誌紀錄",
@@ -37,5 +37,22 @@
 
 	"Create Log": "創建日誌",
 
-	"Line Chart": "折線圖"
+	"Line Chart": "折線圖",
+
+	"Tem1": "溫度1",
+	"Tem2": "溫度2",
+	"Tem3": "溫度3",
+	"Tem4": "溫度4",
+
+	"Hum1": "濕度1",
+	"Hum2": "濕度2",
+	"Hum3": "濕度3",
+	"Hum4": "濕度4",
+
+	"Vol1": "音量1",
+	"Vol2": "音量2",
+	"Vol3": "音量3",
+	"Vol4": "音量4",
+
+	"Weight": "重量"
 }
