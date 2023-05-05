@@ -46,7 +46,7 @@ $("#searchBtn").click(function(){
     properties.forEach(function(propName){
         rowWrap.append(`
             <div class="col-lg-12">
-                <line-chart-panel title="${propName}" loading></line-chart-panel>
+                <line-chart-panel title="${_t(propName)}" loading></line-chart-panel>
             </div>
         `);
     });
