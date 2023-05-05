@@ -1,6 +1,26 @@
 
 (function(scope){
 
+    var _unitSet = {
+        "Tem1": "°C",
+        "Tem2": "°C",
+        "Tem3": "°C",
+        "Tem4": "°C",
+        "Hum1": "%",
+        "Hum2": "%",
+        "Hum3": "%",
+        "Hum4": "%",
+        "Vol1": "dB",
+        "Vol2": "dB",
+        "Vol3": "dB",
+        "Vol4": "dB",
+        "Weight": "Kg"
+    }
+
+    var _getUnit = function(prop) {
+        return _unitSet[prop] || "";
+    };
+
     var _assign = function(source, nextSource){
         var to = {};
 
@@ -90,7 +110,7 @@
                         var outputs = [];
                         currentAllData.forEach(function(series){
                             var val = series.data[XdataIndex][1];
-                            if ( val ) outputs.push(series.label + ": " + parseFloat(val).toFixed(2) );
+                            if ( val ) outputs.push(series.label + ": " + parseFloat(val).toFixed(2).replace(/(\.0+|0+)$/, '') + " " + series.unit );
                         });
                         return "<b>%x</b> <br/>" + outputs.join("<br/>");
                     };
@@ -220,7 +240,8 @@
                 propLabel = isStr ? item : item.label;
             propKeyMapData[propKey] = {
                 label: _t(propLabel),
-                data: []
+                data: [],
+                unit: _getUnit(propLabel)
             };
         });
         
