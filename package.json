@@ -22,13 +22,13 @@
 		"express": "^4.16.4",
 		"express-flash": "0.0.2",
 		"express-session": "^1.15.6",
-		"firebase-admin": "^7.0.0",
+		"firebase-admin": "^11.4.1",
 		"md5": "^2.2.1",
 		"mqtt": "^4.2.1",
 		"node-uuid": "^1.4.8",
 		"nunjucks": "^3.2.0",
 		"passport": "^0.4.0",
-		"passport-jwt": "^4.0.0",
+		"passport-jwt": "^4.0.1",
 		"passport-local": "^1.0.0"
 	}
 }
