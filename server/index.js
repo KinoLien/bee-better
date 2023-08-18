@@ -13,8 +13,8 @@ require('./config/express')(app, passport);
 // Bootstrap routes
 require('./config/routes')(app, passport);
 
-// Schedules
-require('./config/schedule')();
+// Schedules (deprecated)
+// require('./config/schedule')();
 
 var server = http.createServer(app).listen(app.get('port'));
 
