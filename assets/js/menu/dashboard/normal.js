@@ -16,9 +16,9 @@ var flotLineChart = new DeviceChart({
 	rightProp: "Lat",
 	labelsMap: {
 		"Lat": "Lux",
-		"Tem2": "WD",
-		"Hum2": "WS",
-		"Tem3": "Soil"
+		// "Tem2": "WD",
+		// "Hum2": "WS",
+		// "Tem3": "Soil"
 	}
 });
 
