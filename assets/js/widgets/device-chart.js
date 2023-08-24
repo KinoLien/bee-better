@@ -69,12 +69,30 @@
         // yMax
         // yMin
         // labelsMap
+        // unitsMap
+        // computedMap
     };
 
     var _getLabel = function(ins, v) {
         var map = ins._options.labelsMap;
         if (typeof map !== "undefined" && typeof map[v] === "string") {
             return map[v];
+        }
+        return v;
+    };
+
+    var _getUnit = function(ins, p) {
+        var map = ins._options.unitsMap;
+        if (typeof map !== "undefined" && typeof map[p] === "string") {
+            return map[p];
+        }
+        return "";
+    };
+
+    var _getComputed = function(ins, p, v) {
+        var map = ins._options.computedMap;
+        if (typeof map !== "undefined" && typeof map[p] === "function") {
+            return map[p](v);
         }
         return v;
     };
@@ -98,7 +116,7 @@
                         var outputs = [];
                         currentAllData.forEach(function(series){
                             var val = series.data[XdataIndex][1];
-                            if ( val ) outputs.push(series.label + ": " + parseFloat(val).toFixed(2) );
+                            if ( val ) outputs.push(series.label + ": " + parseFloat(val).toFixed(2) + _getUnit(ins, series.label) );
                         });
                         return "<b>%x</b> <br/>" + outputs.join("<br/>");
                     };
@@ -119,6 +137,8 @@
                     axisLabelPadding: 3
                 }
             ];
+        } else {
+            customPlotOpts.yaxes = { position: 'left' };
         }
 
         // yMax and yMin
@@ -130,7 +150,7 @@
                 customPlotOpts.yaxes[0] = _assign(customPlotOpts.yaxes[0], { max: yMax0 });
                 customPlotOpts.yaxes[1] = _assign(customPlotOpts.yaxes[1], { max: yMax1 });
             } else {
-                customPlotOpts.yaxis = _assign(customPlotOpts.yaxis || {}, { max: options.yMax });
+                customPlotOpts.yaxes = _assign(customPlotOpts.yaxes || {}, { max: options.yMax });
             }
         }
         if ( typeof options.yMin != "undefined" ) {
@@ -141,7 +161,7 @@
                 customPlotOpts.yaxes[0] = _assign(customPlotOpts.yaxes[0], { min: yMin0 });
                 customPlotOpts.yaxes[1] = _assign(customPlotOpts.yaxes[1], { min: yMin1 });
             } else {
-                customPlotOpts.yaxis = _assign(customPlotOpts.yaxis || {}, { min: options.yMin });
+                customPlotOpts.yaxes = _assign(customPlotOpts.yaxes || {}, { min: options.yMin });
             }
         }
 
@@ -312,6 +332,10 @@
                     var propAvg = validValues.reduce(function(acc, cur){ return acc + cur; }, 0) / validValues.length;
 
                     propAvg = isValidValue(propKey, propAvg) ? propAvg : null;
+
+                    if ( propAvg !== null ) {
+                        propAvg = _getComputed(self, propKey, propAvg);
+                    }
                     
                     propKeyMapData[propKey].data.push( [ pointStamp, propAvg ] );
                 });
